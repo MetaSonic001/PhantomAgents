@@ -1,0 +1,225 @@
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import { Search, Star, TrendingUp } from "lucide-react"
+
+// Mock marketplace agents
+const mockAgents = [
+  {
+    id: "1",
+    name: "Crypto Trader Pro",
+    creator: "TradeFi Labs",
+    type: "Trading Agent",
+    description: "Execute trades with real-time market analysis",
+    rating: 4.8,
+    reviews: 142,
+    price: 99,
+    trending: true,
+    capabilities: ["Trading Signals", "Market Analysis", "Risk Management"],
+  },
+  {
+    id: "2",
+    name: "Market Oracle",
+    creator: "Prediction.AI",
+    type: "Prediction Oracle",
+    description: "Real-time price and event predictions",
+    rating: 4.6,
+    reviews: 98,
+    price: 79,
+    capabilities: ["Price Forecasting", "Event Prediction", "Accuracy 92%"],
+  },
+  {
+    id: "3",
+    name: "DAO Delegate",
+    creator: "Governance Labs",
+    type: "Governance Delegate",
+    description: "Participate in DAO governance automatically",
+    rating: 4.9,
+    reviews: 215,
+    price: 49,
+    trending: true,
+    capabilities: ["Voting", "Proposal Analysis", "Vote Delegation"],
+  },
+  {
+    id: "4",
+    name: "Research Assistant",
+    creator: "ResearchHub",
+    type: "Research Assistant",
+    description: "Generate comprehensive research reports",
+    rating: 4.7,
+    reviews: 156,
+    price: 69,
+    capabilities: ["Data Analysis", "Report Generation", "Citations"],
+  },
+  {
+    id: "5",
+    name: "Social Manager",
+    creator: "SocialIO",
+    type: "Social Agent",
+    description: "Manage social media across platforms",
+    rating: 4.5,
+    reviews: 87,
+    price: 59,
+    capabilities: ["Multi-platform", "Scheduling", "Analytics"],
+  },
+  {
+    id: "6",
+    name: "Task Automator",
+    creator: "WorkflowAI",
+    type: "Task Manager",
+    description: "Automate complex workflows and tasks",
+    rating: 4.4,
+    reviews: 72,
+    price: 39,
+    capabilities: ["Workflow Building", "Task Scheduling", "Logging"],
+  },
+]
+
+const CATEGORIES = ["All", "Trading", "Research", "Governance", "Productivity", "Social"]
+
+export default function MarketplacePage() {
+  const [selectedCategory, setSelectedCategory] = useState("All")
+  const [sortBy, setSortBy] = useState("popular")
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const filteredAgents = mockAgents.filter((agent) => {
+    const matchesSearch =
+      agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      agent.description.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCategory = selectedCategory === "All" || agent.type.includes(selectedCategory)
+    return matchesSearch && matchesCategory
+  })
+
+  const sortedAgents = [...filteredAgents].sort((a, b) => {
+    if (sortBy === "popular") return b.reviews - a.reviews
+    if (sortBy === "rating") return b.rating - a.rating
+    if (sortBy === "newest") return 0
+    if (sortBy === "price-low") return a.price - b.price
+    return 0
+  })
+
+  return (
+    <div className="p-8 space-y-8">
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold mb-2">Agent Marketplace</h1>
+        <p className="text-muted-foreground">Discover and rent production-ready AI agents</p>
+      </div>
+
+      {/* Search Bar */}
+      <div className="flex gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search agents..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-md border border-border bg-input text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
+        <div className="flex gap-2">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-3 py-2.5 rounded-md border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="popular">Most Popular</option>
+            <option value="rating">Top Rated</option>
+            <option value="newest">Newest</option>
+            <option value="price-low">Price: Low to High</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Category Tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {CATEGORIES.map((category) => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition ${
+              selectedCategory === category
+                ? "bg-primary text-primary-foreground"
+                : "border border-border hover:bg-secondary"
+            }`}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+
+      {/* Agents Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sortedAgents.map((agent) => (
+          <Link
+            key={agent.id}
+            href={`/dashboard/marketplace/${agent.id}`}
+            className="border border-border rounded-lg overflow-hidden hover:border-accent transition group cursor-pointer bg-card"
+          >
+            {/* Card Header */}
+            <div className="p-6 border-b border-border flex items-start justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-muted"></div>
+                  {agent.trending && (
+                    <span className="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-700 font-medium flex items-center gap-1">
+                      <TrendingUp className="w-3 h-3" /> Trending
+                    </span>
+                  )}
+                </div>
+                <h3 className="font-semibold text-base mb-1">{agent.name}</h3>
+                <p className="text-xs text-muted-foreground">{agent.creator}</p>
+              </div>
+            </div>
+
+            {/* Card Body */}
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-muted-foreground line-clamp-2">{agent.description}</p>
+
+              {/* Rating */}
+              <div className="flex items-center gap-2">
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${i < Math.floor(agent.rating) ? "fill-primary text-primary" : "text-muted"}`}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm font-medium">{agent.rating}</span>
+                <span className="text-xs text-muted-foreground">({agent.reviews})</span>
+              </div>
+
+              {/* Capabilities */}
+              <div className="flex flex-wrap gap-2">
+                {agent.capabilities.slice(0, 2).map((cap, i) => (
+                  <span key={i} className="text-xs px-2 py-1 rounded-full bg-secondary text-foreground">
+                    {cap}
+                  </span>
+                ))}
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-between pt-4 border-t border-border">
+                <div>
+                  <p className="text-xs text-muted-foreground">From</p>
+                  <p className="text-lg font-bold">${agent.price}</p>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                  }}
+                  className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition text-sm font-medium"
+                >
+                  Subscribe
+                </button>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  )
+}
