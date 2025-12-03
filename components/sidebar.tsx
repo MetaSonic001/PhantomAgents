@@ -9,7 +9,6 @@ import {
   Trophy,
   BarChart3,
   Settings,
-  BookOpen,
   Plus,
   Users,
   Activity,
@@ -60,7 +59,6 @@ const advancedItems = [
 ]
 
 const secondaryItems = [
-  { icon: BookOpen, label: "Documentation", href: "/docs" },
   { icon: Settings, label: "Settings", href: "/dashboard/settings" },
 ]
 
