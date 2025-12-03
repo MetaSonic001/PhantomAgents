@@ -78,10 +78,13 @@ const mockAgents = [
 
 const CATEGORIES = ["All", "Trading", "Research", "Governance", "Productivity", "Social"]
 
+const MARKETPLACE_TABS = ["Listings", "NFTs"]
+
 export default function MarketplacePage() {
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [sortBy, setSortBy] = useState("popular")
   const [searchQuery, setSearchQuery] = useState("")
+  const [activeTab, setActiveTab] = useState(MARKETPLACE_TABS[0])
 
   const filteredAgents = mockAgents.filter((agent) => {
     const matchesSearch =
@@ -104,7 +107,22 @@ export default function MarketplacePage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold mb-2">Agent Marketplace</h1>
-        <p className="text-muted-foreground">Discover and rent production-ready AI agents</p>
+        <p className="text-muted-foreground">Discover and rent production-ready AI agents — listings, NFTs, and buying tools</p>
+      </div>
+
+      {/* Tabs for Listings / NFTs */}
+      <div className="flex gap-2">
+        {MARKETPLACE_TABS.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+              activeTab === tab ? "bg-primary text-primary-foreground" : "border border-border hover:bg-secondary"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
       {/* Search Bar */}
@@ -150,76 +168,233 @@ export default function MarketplacePage() {
         ))}
       </div>
 
-      {/* Agents Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sortedAgents.map((agent) => (
-          <Link
-            key={agent.id}
-            href={`/dashboard/marketplace/${agent.id}`}
-            className="border border-border rounded-lg overflow-hidden hover:border-accent transition group cursor-pointer bg-card"
-          >
-            {/* Card Header */}
-            <div className="p-6 border-b border-border flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-muted"></div>
-                  {agent.trending && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-700 font-medium flex items-center gap-1">
-                      <TrendingUp className="w-3 h-3" /> Trending
-                    </span>
-                  )}
+      {/* Main content: switch between Listings and NFTs */}
+      {activeTab === "Listings" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sortedAgents.map((agent) => (
+            <Link
+              key={agent.id}
+              href={`/dashboard/marketplace/${agent.id}`}
+              className="border border-border rounded-lg overflow-hidden hover:border-accent transition group cursor-pointer bg-card"
+            >
+              {/* Card Header */}
+              <div className="p-6 border-b border-border flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-10 h-10 rounded-lg bg-muted"></div>
+                    {agent.trending && (
+                      <span className="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-700 font-medium flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3" /> Trending
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="font-semibold text-base mb-1">{agent.name}</h3>
+                  <p className="text-xs text-muted-foreground">{agent.creator}</p>
                 </div>
-                <h3 className="font-semibold text-base mb-1">{agent.name}</h3>
-                <p className="text-xs text-muted-foreground">{agent.creator}</p>
               </div>
-            </div>
 
-            {/* Card Body */}
-            <div className="p-6 space-y-4">
-              <p className="text-sm text-muted-foreground line-clamp-2">{agent.description}</p>
+              {/* Card Body */}
+              <div className="p-6 space-y-4">
+                <p className="text-sm text-muted-foreground line-clamp-2">{agent.description}</p>
 
-              {/* Rating */}
-              <div className="flex items-center gap-2">
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-4 h-4 ${i < Math.floor(agent.rating) ? "fill-primary text-primary" : "text-muted"}`}
-                    />
+                {/* Rating */}
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-4 h-4 ${i < Math.floor(agent.rating) ? "fill-primary text-primary" : "text-muted"}`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm font-medium">{agent.rating}</span>
+                  <span className="text-xs text-muted-foreground">({agent.reviews})</span>
+                </div>
+
+                {/* Capabilities */}
+                <div className="flex flex-wrap gap-2">
+                  {agent.capabilities.slice(0, 2).map((cap, i) => (
+                    <span key={i} className="text-xs px-2 py-1 rounded-full bg-secondary text-foreground">
+                      {cap}
+                    </span>
                   ))}
                 </div>
-                <span className="text-sm font-medium">{agent.rating}</span>
-                <span className="text-xs text-muted-foreground">({agent.reviews})</span>
-              </div>
 
-              {/* Capabilities */}
-              <div className="flex flex-wrap gap-2">
-                {agent.capabilities.slice(0, 2).map((cap, i) => (
-                  <span key={i} className="text-xs px-2 py-1 rounded-full bg-secondary text-foreground">
-                    {cap}
-                  </span>
-                ))}
-              </div>
-
-              {/* Footer */}
-              <div className="flex items-center justify-between pt-4 border-t border-border">
-                <div>
-                  <p className="text-xs text-muted-foreground">From</p>
-                  <p className="text-lg font-bold">${agent.price}</p>
+                {/* Footer */}
+                <div className="flex items-center justify-between pt-4 border-t border-border">
+                  <div>
+                    <p className="text-xs text-muted-foreground">From</p>
+                    <p className="text-lg font-bold">${agent.price}</p>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                    }}
+                    className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition text-sm font-medium"
+                  >
+                    Subscribe
+                  </button>
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault()
-                  }}
-                  className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition text-sm font-medium"
-                >
-                  Subscribe
-                </button>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {activeTab === "NFTs" && (
+        <div className="space-y-6">
+          {/* Token Economics Overview (copied from legacy NFTs page) */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="border border-border rounded-lg p-4 bg-card">
+              <p className="text-xs text-muted-foreground mb-1">Total Supply</p>
+              <p className="text-2xl font-bold">1,000,000</p>
+              <p className="text-xs text-muted-foreground mt-1">PA Tokens</p>
+            </div>
+            <div className="border border-border rounded-lg p-4 bg-card">
+              <p className="text-xs text-muted-foreground mb-1">Circulating</p>
+              <p className="text-2xl font-bold">450K</p>
+              <p className="text-xs text-muted-foreground mt-1">45.0%</p>
+            </div>
+            <div className="border border-border rounded-lg p-4 bg-card">
+              <p className="text-xs text-muted-foreground mb-1">Staking APY</p>
+              <p className="text-2xl font-bold text-green-600">15.5%</p>
+              <p className="text-xs text-muted-foreground mt-1">Current average</p>
+            </div>
+            <div className="border border-border rounded-lg p-4 bg-card">
+              <p className="text-xs text-muted-foreground mb-1">Governance Votes</p>
+              <p className="text-2xl font-bold">128</p>
+              <p className="text-xs text-muted-foreground mt-1">Active proposals</p>
+            </div>
+            <div className="border border-border rounded-lg p-4 bg-card">
+              <p className="text-xs text-muted-foreground mb-1">Treasury Value</p>
+              <p className="text-2xl font-bold">$245K</p>
+              <p className="text-xs text-muted-foreground mt-1">DAO reserves</p>
+            </div>
+          </div>
+
+          {/* Staking Opportunities (copied) */}
+          <div className="border border-border rounded-lg bg-card p-6">
+            <h2 className="text-xl font-bold mb-4">Staking Opportunities</h2>
+            <div className="grid md:grid-cols-4 gap-4">
+              {[
+                { period: "30 Days", apy: "12.5%", minStake: 100 },
+                { period: "90 Days", apy: "18.3%", minStake: 500 },
+                { period: "180 Days", apy: "24.5%", minStake: 1000 },
+                { period: "365 Days", apy: "35.2%", minStake: 2000 },
+              ].map((stake, idx) => (
+                <div key={idx} className="border border-border rounded-lg p-4 hover:border-accent transition">
+                  <p className="font-semibold mb-3">{stake.period}</p>
+                  <div className="space-y-2 mb-4">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Annual APY</p>
+                      <p className="text-2xl font-bold text-green-600">{stake.apy}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Minimum Stake</p>
+                      <p className="text-lg font-semibold">{stake.minStake.toLocaleString()} PA</p>
+                    </div>
+                  </div>
+                  <button className="w-full px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition font-medium text-sm">
+                    Stake Now
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* NFT Marketplace copied UI */}
+          <div className="border border-border rounded-lg bg-card p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold">Agent NFT Marketplace</h2>
+              <div className="flex gap-2">
+                <button className="px-4 py-2 border border-border rounded-md hover:bg-secondary transition text-sm font-medium">All</button>
+                <button className="px-4 py-2 border border-border rounded-md hover:bg-secondary transition text-sm font-medium">Listed</button>
+                <button className="px-4 py-2 border border-border rounded-md hover:bg-secondary transition text-sm font-medium">My Collection</button>
               </div>
             </div>
-          </Link>
-        ))}
-      </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  id: 1,
+                  name: "Crypto Trader Pro V2",
+                  creator: "TradeFi Labs",
+                  floorPrice: 2.5,
+                  volume: 45.3,
+                  owners: 234,
+                  rarity: "Rare",
+                  traits: ["High-Performance", "Multi-Exchange", "Risk-Managed"],
+                  image: "🤖",
+                  listed: true,
+                  royalty: 5,
+                },
+                {
+                  id: 2,
+                  name: "Market Oracle Elite",
+                  creator: "Analytics Pro",
+                  floorPrice: 1.8,
+                  volume: 32.1,
+                  owners: 156,
+                  rarity: "Epic",
+                  traits: ["Predictive", "ML-Powered", "Accurate"],
+                  image: "🔮",
+                  listed: true,
+                  royalty: 7,
+                },
+                {
+                  id: 3,
+                  name: "DAO Governance Bot",
+                  creator: "Governance Solutions",
+                  floorPrice: 1.2,
+                  volume: 18.5,
+                  owners: 89,
+                  rarity: "Uncommon",
+                  traits: ["Automated Voting", "Delegate", "Transparent"],
+                  image: "🏛️",
+                  listed: false,
+                  royalty: 3,
+                },
+              ].map((nft) => (
+                <div key={nft.id} className="border border-border rounded-lg overflow-hidden hover:border-accent transition">
+                  <div className="aspect-square bg-gradient-to-br from-secondary to-secondary/50 flex items-center justify-center text-6xl">{nft.image}</div>
+                  <div className="p-4 space-y-3">
+                    <div>
+                      <h3 className="font-semibold">{nft.name}</h3>
+                      <p className="text-xs text-muted-foreground">{nft.creator}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="bg-secondary/50 p-2 rounded">
+                        <p className="text-muted-foreground">Floor</p>
+                        <p className="font-semibold">{nft.floorPrice} ETH</p>
+                      </div>
+                      <div className="bg-secondary/50 p-2 rounded">
+                        <p className="text-muted-foreground">Volume</p>
+                        <p className="font-semibold">{nft.volume} ETH</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 text-xs">
+                      <span className="px-2 py-1 bg-primary/10 text-primary rounded">{nft.rarity}</span>
+                      <span className="px-2 py-1 bg-secondary/50 rounded">{nft.owners} owners</span>
+                    </div>
+
+                    <div className="flex gap-2 text-xs flex-wrap">
+                      {nft.traits.map((trait, idx) => (
+                        <span key={idx} className="px-2 py-1 border border-border rounded text-muted-foreground">{trait}</span>
+                      ))}
+                    </div>
+
+                    <button className={`w-full px-4 py-2 rounded-md font-medium text-sm transition ${nft.listed ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border border-border hover:bg-secondary"}`}>
+                      {nft.listed ? "Buy Now" : "Make Offer"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

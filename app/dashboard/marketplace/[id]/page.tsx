@@ -1,5 +1,79 @@
 "use client"
 
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { ArrowLeft, Play, ShoppingCart } from "lucide-react"
+
+// Lightweight client-side detail page (mock data)
+const MOCK = {
+  id: "1",
+  name: "Crypto Trader Pro",
+  creator: "TradeFi Labs",
+  description: "Execute trades with real-time market analysis and automated strategies.",
+  price: 99,
+  features: ["Trading Signals", "Backtesting", "Risk Management"],
+}
+
+export default function ListingDetailPage({ params }: { params: { id: string } }) {
+  const router = useRouter()
+  const { id } = params
+
+  // In a full app we'd fetch listing by id here
+  const listing = MOCK.id === id ? MOCK : { ...MOCK, id }
+
+  return (
+    <div className="p-8">
+      <div className="mb-6">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-sm text-muted-foreground">
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-8">
+        <div className="col-span-2 space-y-4">
+          <h1 className="text-3xl font-bold">{listing.name}</h1>
+          <p className="text-sm text-muted-foreground">by {listing.creator}</p>
+
+          <div className="border border-border rounded-lg p-4 bg-card">
+            <h3 className="font-semibold mb-2">Description</h3>
+            <p className="text-sm text-muted-foreground">{listing.description}</p>
+          </div>
+
+          <div className="border border-border rounded-lg p-4 bg-card">
+            <h3 className="font-semibold mb-2">Features</h3>
+            <ul className="list-disc ml-5 text-sm">
+              {listing.features.map((f) => (
+                <li key={f}>{f}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <aside className="space-y-4">
+          <div className="border border-border rounded-lg p-6 bg-card">
+            <p className="text-xs text-muted-foreground">Price</p>
+            <p className="text-2xl font-bold">${listing.price}</p>
+            <div className="mt-4 space-y-2">
+              <Link href={`/dashboard/marketplace/${id}/test`} className="w-full block text-center px-4 py-2 rounded-md bg-secondary hover:bg-secondary/90 transition font-medium">
+                <Play className="inline w-4 h-4 mr-2" /> Test in Sandbox
+              </Link>
+              <Link href={`/dashboard/marketplace/${id}/buy`} className="w-full block text-center px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition font-medium">
+                <ShoppingCart className="inline w-4 h-4 mr-2" /> Buy / Subscribe
+              </Link>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-lg p-4 bg-card">
+            <p className="text-xs text-muted-foreground">Support</p>
+            <p className="text-sm">Contact the creator for custom integrations and enterprise pricing.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  )
+}
+"use client"
+
 import { useState } from "react"
 import Link from "next/link"
 import { ArrowLeft, Star, TrendingUp, MessageSquare, CheckCircle2, Copy, Heart } from "lucide-react"

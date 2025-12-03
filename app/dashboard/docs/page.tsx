@@ -1,6 +1,6 @@
 "use client"
 
-import { BookOpen, Code2, ExternalLink } from "lucide-react"
+import { BookOpen, Code2, ExternalLink, Copy } from "lucide-react"
 
 export default function DocsPage() {
   const docSections = [
@@ -52,6 +52,47 @@ agent.deploy()`,
       code: `curl -X POST https://api.phantom.ai/v1/agents/123/run \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -d '{"action": "analyze", "data": {...}}'`,
+    },
+  ]
+
+  const endpoints = [
+    {
+      method: "GET",
+      path: "/api/agents",
+      title: "List Agents",
+      description: "Retrieve all your agents with pagination support",
+      params: [
+        { name: "page", type: "integer", desc: "Page number (default: 1)" },
+        { name: "limit", type: "integer", desc: "Items per page (default: 20)" },
+      ],
+      responseSample: {
+        agents: [
+          { id: "agent_123", name: "Trading Bot", status: "active", created: "2024-01-15" },
+        ],
+        total: 5,
+      },
+    },
+    {
+      method: "POST",
+      path: "/api/agents",
+      title: "Create Agent",
+      description: "Create a new AI agent",
+      params: [
+        { name: "name", type: "string", desc: "Agent name (required)" },
+        { name: "type", type: "string", desc: "Agent type (required)" },
+      ],
+      responseSample: { id: "agent_123", name: "Trading Bot", status: "draft", created: "2024-12-03" },
+    },
+    {
+      method: "POST",
+      path: "/api/agents/:id/execute",
+      title: "Execute Agent",
+      description: "Run an agent with provided input",
+      params: [
+        { name: "id", type: "string", desc: "Agent ID (in URL)" },
+        { name: "input", type: "object", desc: "Execution input parameters" },
+      ],
+      responseSample: { runId: "run_456", status: "success", output: { signal: "BUY" }, duration: "1.24s" },
     },
   ]
 
@@ -119,6 +160,34 @@ agent.deploy()`,
               <pre className="p-4 text-xs overflow-x-auto bg-background">
                 <code className="font-mono">{example.code}</code>
               </pre>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Embedded API Reference (merged from api-docs) */}
+      <div className="border border-border rounded-lg bg-card p-6">
+        <h2 className="text-xl font-bold mb-4">API Reference (Quick)</h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          {endpoints.map((ep, idx) => (
+            <div key={idx} className="p-4 border border-border rounded-lg bg-background">
+              <div className="flex items-center gap-3 mb-2">
+                <span className={`px-2 py-1 rounded text-xs font-semibold ${ep.method === "GET" ? "bg-blue-500/10 text-blue-600" : "bg-green-500/10 text-green-600"}`}>
+                  {ep.method}
+                </span>
+                <code className="text-xs font-mono text-muted-foreground">{ep.path}</code>
+              </div>
+              <p className="text-sm font-medium mb-2">{ep.title}</p>
+              <p className="text-xs text-muted-foreground mb-3">{ep.description}</p>
+              <div className="text-xs text-muted-foreground mb-2">Params:</div>
+              <ul className="text-xs mb-3">
+                {ep.params.map((p, i) => (
+                  <li key={i}>{p.name} — {p.type} — {p.desc}</li>
+                ))}
+              </ul>
+              <div className="bg-secondary/30 rounded p-2 text-xs font-mono overflow-x-auto">
+                <pre>{JSON.stringify(ep.responseSample, null, 2)}</pre>
+              </div>
             </div>
           ))}
         </div>

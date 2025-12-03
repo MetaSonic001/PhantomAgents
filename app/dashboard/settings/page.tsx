@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Sidebar } from "@/components/sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { Copy, Trash2, Eye, EyeOff } from "lucide-react"
+import { getKeys, addKey, deleteKey, maskKey, ProviderKey } from "@/lib/keys-client"
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile")
@@ -154,42 +155,117 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {/* API Keys Tab */}
+            {/* API / Provider Keys Tab (BYO keys - frontend only) */}
             {activeTab === "api" && (
               <div className="space-y-6">
                 <div className="border border-border rounded-lg p-6 bg-card">
-                  <h2 className="text-lg font-bold mb-4">API Keys</h2>
-                  <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition font-medium text-sm mb-6">
-                    Generate New Key
-                  </button>
+                  <h2 className="text-lg font-bold mb-4">Provider Keys (BYO)</h2>
+
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Add your LLM provider keys here for testing. Keys are stored in your browser's local storage
+                    (frontend-only). Do not add production secrets — server-side storage will be implemented later.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                    <input
+                      placeholder="Name (eg. OpenAI - dev)"
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      className="px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm"
+                    />
+                    <input
+                      placeholder="Provider (eg. openai)"
+                      value={newProvider}
+                      onChange={(e) => setNewProvider(e.target.value)}
+                      className="px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm"
+                    />
+                    <input
+                      placeholder="Provider Key"
+                      value={newKey}
+                      onChange={(e) => setNewKey(e.target.value)}
+                      className="px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm"
+                    />
+                  </div>
+
+                  <div className="flex gap-2 mb-6">
+                    <button
+                      onClick={() => {
+                        if (!newName || !newProvider || !newKey) return alert("Please fill all fields")
+                        const created = addKey({ name: newName, provider: newProvider, key: newKey })
+                        setKeys((prev) => [created, ...prev])
+                        setNewKey("")
+                        setNewName("")
+                        setNewProvider("")
+                        alert("Key added locally. Move this to server storage before production.")
+                      }}
+                      className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition font-medium text-sm"
+                    >
+                      Add Key
+                    </button>
+                    <button
+                      onClick={() => {
+                        setNewKey("")
+                        setNewName("")
+                        setNewProvider("")
+                      }}
+                      className="px-4 py-2 border border-border rounded-md hover:bg-secondary transition font-medium text-sm"
+                    >
+                      Reset
+                    </button>
+                  </div>
 
                   <div className="space-y-3">
-                    {[
-                      { name: "Production Key", created: "2 weeks ago", usage: 1234 },
-                      { name: "Development Key", created: "1 month ago", usage: 56 },
-                    ].map((key, i) => (
-                      <div key={i} className="border border-border rounded-lg p-4 bg-secondary/30">
+                    {keys.length === 0 && (
+                      <div className="text-sm text-muted-foreground">No keys added yet. Add one above to get started.</div>
+                    )}
+
+                    {keys.map((k) => (
+                      <div key={k.id} className="border border-border rounded-lg p-4 bg-secondary/30">
                         <div className="flex items-center justify-between mb-3">
                           <div>
-                            <p className="font-medium text-sm">{key.name}</p>
-                            <p className="text-xs text-muted-foreground">Created {key.created}</p>
+                            <p className="font-medium text-sm">{k.name}</p>
+                            <p className="text-xs text-muted-foreground">Provider: {k.provider}</p>
                           </div>
                           <div className="flex gap-2">
-                            <button className="p-1.5 hover:bg-secondary rounded-md transition">
+                            <button
+                              onClick={async () => {
+                                try {
+                                  await navigator.clipboard.writeText(k.key)
+                                  alert("Key copied to clipboard")
+                                } catch (e) {
+                                  console.error(e)
+                                  alert("Copy failed")
+                                }
+                              }}
+                              className="p-1.5 hover:bg-secondary rounded-md transition"
+                            >
                               <Copy className="w-4 h-4" />
                             </button>
-                            <button className="p-1.5 hover:bg-secondary rounded-md transition text-destructive">
+                            <button
+                              onClick={() => {
+                                if (!confirm(`Delete key '${k.name}'?`)) return
+                                deleteKey(k.id)
+                                setKeys((prev) => prev.filter((p) => p.id !== k.id))
+                              }}
+                              className="p-1.5 hover:bg-secondary rounded-md transition text-destructive"
+                            >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
+
                         <div className="flex items-center gap-2 p-2 bg-background rounded text-xs font-mono">
-                          <span className="flex-1 overflow-x-auto">pa_sk_live_••••••••••••••</span>
-                          <button className="p-1 hover:bg-secondary rounded transition">
-                            {showApiKey ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                          <span className="flex-1 overflow-x-auto">
+                            {showMap[k.id] ? k.key : maskKey(k.key)}
+                          </span>
+                          <button
+                            onClick={() => setShowMap((m) => ({ ...m, [k.id]: !m[k.id] }))}
+                            className="p-1 hover:bg-secondary rounded transition"
+                          >
+                            {showMap[k.id] ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                           </button>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-2">{key.usage} requests this month</p>
+                        <p className="text-xs text-muted-foreground mt-2">Added {new Date(k.created).toLocaleString()}</p>
                       </div>
                     ))}
                   </div>

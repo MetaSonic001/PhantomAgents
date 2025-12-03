@@ -31,30 +31,29 @@ import { cn } from "@/lib/utils"
 
 const navItems = [
   { icon: LayoutGrid, label: "Dashboard", href: "/dashboard" },
-  { icon: Zap, label: "My Agents", href: "/dashboard/agents" },
+  // Agents becomes a grouped section with logical sub-pages (Overview, Runs, Network)
+  { icon: Zap, label: "Agents", href: "/dashboard/agents" },
   { icon: ShoppingCart, label: "Marketplace", href: "/dashboard/marketplace" },
   { icon: Trophy, label: "Competitions", href: "/dashboard/competitions" },
   { icon: BarChart3, label: "Analytics", href: "/dashboard/analytics" },
 ]
 
+// Items that appear under Operations (kept lightweight)
 const additionalItems = [
-  { icon: Activity, label: "Agent Runs", href: "/dashboard/agent-runs" },
+  // Agent Runs and Agent Network are surfaced under the Agents group — keep main list focused
   { icon: Users, label: "Team", href: "/dashboard/team" },
   { icon: Webhook, label: "Webhooks", href: "/dashboard/webhooks" },
   { icon: Bell, label: "Notifications", href: "/dashboard/notifications" },
   { icon: Database, label: "API Docs", href: "/dashboard/api-docs" },
 ]
 
+// Advanced section: remove duplicates and consolidate (Agent NFTs merged into Marketplace)
 const advancedItems = [
   { icon: Gamepad2, label: "Playground", href: "/dashboard/playground" },
-  { icon: Wallet, label: "Agent NFTs", href: "/dashboard/agent-nfts" },
-  { icon: Network, label: "Agent Network", href: "/dashboard/agent-network" },
   { icon: Shield, label: "Trust Center", href: "/dashboard/trust-center" },
   { icon: BookOpenCheck, label: "Research Agents", href: "/dashboard/research-agents" },
   { icon: Mic, label: "Voice Agents", href: "/dashboard/voice-agents" },
-  { icon: TrendingUp, label: "Advanced Analytics", href: "/dashboard/advanced-analytics" },
   { icon: Zap, label: "Templates", href: "/dashboard/templates" },
-  { icon: Users, label: "Collaboration", href: "/dashboard/collaboration" },
   { icon: AlertTriangle, label: "AI Safety", href: "/dashboard/ai-safety" },
   { icon: GitBranch, label: "Version Control", href: "/dashboard/version-control" },
   { icon: DollarSign, label: "Cost Management", href: "/dashboard/cost-management" },
@@ -96,19 +95,59 @@ export function Sidebar() {
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium transition",
-                isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/50",
+            <div key={item.href}>
+              <Link
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium transition",
+                  isActive
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50",
+                )}
+              >
+                <item.icon className="w-4 h-4" />
+                {item.label}
+              </Link>
+
+              {/* Agents grouped sub-links */}
+              {item.label === "Agents" && (
+                <div className="mt-1 ml-8 flex flex-col">
+                  <Link
+                    href="/dashboard/agents"
+                    className={cn(
+                      "text-xs px-2 py-1 rounded-md transition whitespace-nowrap",
+                      pathname === "/dashboard/agents" || pathname.startsWith("/dashboard/agents/")
+                        ? "text-sidebar-accent-foreground"
+                        : "text-sidebar-foreground/70 hover:text-sidebar-foreground",
+                    )}
+                  >
+                    Overview
+                  </Link>
+                  <Link
+                    href="/dashboard/agents/runs"
+                    className={cn(
+                      "text-xs px-2 py-1 rounded-md transition whitespace-nowrap",
+                      pathname === "/dashboard/agent-runs" || pathname.startsWith("/dashboard/agents/runs")
+                        ? "text-sidebar-accent-foreground"
+                        : "text-sidebar-foreground/70 hover:text-sidebar-foreground",
+                    )}
+                  >
+                    Runs
+                  </Link>
+                  <Link
+                    href="/dashboard/agents/network"
+                    className={cn(
+                      "text-xs px-2 py-1 rounded-md transition whitespace-nowrap",
+                      pathname === "/dashboard/agent-network" || pathname.startsWith("/dashboard/agents/network")
+                        ? "text-sidebar-accent-foreground"
+                        : "text-sidebar-foreground/70 hover:text-sidebar-foreground",
+                    )}
+                  >
+                    Network
+                  </Link>
+                </div>
               )}
-            >
-              <item.icon className="w-4 h-4" />
-              {item.label}
-            </Link>
+            </div>
           )
         })}
 
