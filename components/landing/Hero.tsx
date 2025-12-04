@@ -153,7 +153,7 @@ const TypewriterText = ({ text }: { text: string }) => {
 
 export const Hero = () => {
     return (
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#030014]">
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
             {/* Background Effects */}
             <HexagonGrid />
             <FloatingOrbs />
@@ -184,7 +184,7 @@ export const Hero = () => {
                     transition={{ duration: 0.8, delay: 0.2 }}
                     className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6"
                 >
-                    <span className="bg-gradient-to-r from-white via-violet-200 to-violet-400 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-violet-700 via-violet-500 to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_1px_0_rgba(0,0,0,0.25)]">
                         Private AI Agents
                     </span>
                     <br />
@@ -198,7 +198,7 @@ export const Hero = () => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.4 }}
-                    className="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto mb-12 leading-relaxed"
+                    className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed"
                 >
                     Build, deploy, and monetize AI agents whose internal logic remains{" "}
                     <span className="text-violet-400 font-semibold">completely private</span>
@@ -224,7 +224,7 @@ export const Hero = () => {
                         <div className="absolute inset-0 bg-gradient-to-r from-violet-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </button>
 
-                    <button className="group px-8 py-4 rounded-xl border border-gray-700 text-gray-300 font-semibold text-lg backdrop-blur-sm hover:border-violet-500/50 hover:text-white hover:bg-violet-500/10 transition-all duration-300">
+                    <button className="group px-8 py-4 rounded-xl border border-border text-muted-foreground font-semibold text-lg backdrop-blur-sm hover:border-violet-500/50 hover:text-foreground hover:bg-violet-500/10 transition-all duration-300">
                         <span className="flex items-center gap-2">
                             Explore Marketplace
                             <svg className="w-5 h-5 opacity-50 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -252,12 +252,12 @@ export const Hero = () => {
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
-                            className="group p-6 rounded-2xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-gray-800 backdrop-blur-sm hover:border-violet-500/30 transition-all duration-300"
+                            className="group p-6 rounded-2xl bg-card border border-border backdrop-blur-sm hover:border-violet-500/30 transition-all duration-300"
                         >
                             <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent mb-2">
                                 {stat.value}
                             </div>
-                            <div className="text-sm text-gray-500 group-hover:text-gray-400 transition-colors">
+                            <div className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                                 {stat.label}
                             </div>
                         </motion.div>
@@ -275,7 +275,7 @@ export const Hero = () => {
                 <motion.div
                     animate={{ y: [0, 10, 0] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
-                    className="flex flex-col items-center gap-2 text-gray-500"
+                    className="flex flex-col items-center gap-2 text-muted-foreground"
                 >
                     <span className="text-xs uppercase tracking-wider">Scroll</span>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

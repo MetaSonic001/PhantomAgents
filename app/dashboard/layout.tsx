@@ -6,7 +6,7 @@ import Animated from "@/components/Animated"
 
 export default function DashboardLayout({ children, }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen bg-[#030014] text-foreground">
+    <div className="relative min-h-screen bg-background text-foreground">
       <AmbientBackground />
       <div className="flex h-screen">
         <Sidebar />

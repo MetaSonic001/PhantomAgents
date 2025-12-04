@@ -30,7 +30,7 @@ export const Navbar = () => {
                 animate={{ y: 0 }}
                 transition={{ duration: 0.6 }}
                 className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-                        ? "py-3 bg-[#030014]/80 backdrop-blur-xl border-b border-gray-800/50"
+                        ? "py-3 bg-background/80 backdrop-blur-xl border-b border-border/50"
                         : "py-6 bg-transparent"
                     }`}
             >
@@ -41,12 +41,12 @@ export const Navbar = () => {
                             <div className="relative w-10 h-10">
                                 <div className="absolute inset-0 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-xl rotate-6" />
                                 <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-indigo-500 rounded-xl flex items-center justify-center">
-                                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg className="w-6 h-6 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                 </div>
                             </div>
-                            <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                            <span className="text-xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
                                 PhantomAgents
                             </span>
                         </Link>
@@ -57,7 +57,7 @@ export const Navbar = () => {
                                 <Link
                                     key={link.name}
                                     href={link.href}
-                                    className="text-gray-400 hover:text-white transition-colors duration-200 text-sm font-medium"
+                                    className="text-muted-foreground hover:text-foreground transition-colors duration-200 text-sm font-medium"
                                 >
                                     {link.name}
                                 </Link>
@@ -68,7 +68,7 @@ export const Navbar = () => {
                         <div className="hidden md:flex items-center gap-4">
                             <Link
                                 href="/auth"
-                                className="px-4 py-2 text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                                className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
                             >
                                 Sign In
                             </Link>
@@ -84,7 +84,7 @@ export const Navbar = () => {
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="md:hidden p-2 text-gray-400 hover:text-white transition-colors"
+                            className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
                         >
                             <svg
                                 className="w-6 h-6"
@@ -123,22 +123,22 @@ export const Navbar = () => {
                         transition={{ duration: 0.2 }}
                         className="fixed inset-x-0 top-[72px] z-40 md:hidden"
                     >
-                        <div className="mx-4 p-6 rounded-2xl bg-gray-900/95 backdrop-blur-xl border border-gray-800">
+                        <div className="mx-4 p-6 rounded-2xl bg-card backdrop-blur-xl border border-border">
                             <div className="flex flex-col gap-4">
                                 {navLinks.map((link) => (
                                     <Link
                                         key={link.name}
                                         href={link.href}
                                         onClick={() => setMobileMenuOpen(false)}
-                                        className="text-gray-300 hover:text-white transition-colors text-lg font-medium py-2"
+                                        className="text-muted-foreground hover:text-foreground transition-colors text-lg font-medium py-2"
                                     >
                                         {link.name}
                                     </Link>
                                 ))}
-                                <div className="pt-4 border-t border-gray-800 flex flex-col gap-3">
+                                <div className="pt-4 border-t border-border flex flex-col gap-3">
                                     <Link
                                         href="/auth"
-                                        className="w-full py-3 text-center text-gray-300 hover:text-white transition-colors font-medium border border-gray-700 rounded-xl"
+                                        className="w-full py-3 text-center text-muted-foreground hover:text-foreground transition-colors font-medium border border-border rounded-xl"
                                     >
                                         Sign In
                                     </Link>

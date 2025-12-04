@@ -67,7 +67,7 @@ const socialLinks = [
 
 export const Footer = () => {
     return (
-        <footer className="relative bg-[#030014] border-t border-gray-800/50">
+        <footer className="relative bg-background border-t border-border/50">
             {/* Background */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-violet-600/5 rounded-full blur-3xl" />
@@ -84,7 +84,7 @@ export const Footer = () => {
                                 <div className="absolute inset-0 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-xl rotate-6" />
                                 <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-indigo-500 rounded-xl flex items-center justify-center">
                                     <svg
-                                        className="w-6 h-6 text-white"
+                                        className="w-6 h-6 text-primary-foreground"
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
@@ -98,9 +98,9 @@ export const Footer = () => {
                                     </svg>
                                 </div>
                             </div>
-                            <span className="text-xl font-bold text-white">PhantomAgents</span>
+                            <span className="text-xl font-bold text-foreground">PhantomAgents</span>
                         </Link>
-                        <p className="text-gray-400 text-sm max-w-xs mb-6 leading-relaxed">
+                        <p className="text-muted-foreground text-sm max-w-xs mb-6 leading-relaxed">
                             The first platform for privacy-preserving AI agents with on-chain
                             verification. Build, deploy, and monetize verified AI.
                         </p>
@@ -112,7 +112,7 @@ export const Footer = () => {
                                     href={social.href}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="p-2 rounded-lg bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-200"
+                                    className="p-2 rounded-lg bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all duration-200"
                                 >
                                     {social.icon}
                                 </a>
@@ -122,13 +122,13 @@ export const Footer = () => {
 
                     {/* Links */}
                     <div>
-                        <h4 className="text-sm font-semibold text-white mb-4">Product</h4>
+                        <h4 className="text-sm font-semibold text-foreground mb-4">Product</h4>
                         <ul className="space-y-3">
                             {footerLinks.product.map((link) => (
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-sm text-gray-400 hover:text-white transition-colors"
+                                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                                     >
                                         {link.name}
                                     </Link>
@@ -138,13 +138,13 @@ export const Footer = () => {
                     </div>
 
                     <div>
-                        <h4 className="text-sm font-semibold text-white mb-4">Developers</h4>
+                        <h4 className="text-sm font-semibold text-foreground mb-4">Developers</h4>
                         <ul className="space-y-3">
                             {footerLinks.developers.map((link) => (
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-sm text-gray-400 hover:text-white transition-colors"
+                                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                                     >
                                         {link.name}
                                     </Link>
@@ -154,13 +154,13 @@ export const Footer = () => {
                     </div>
 
                     <div>
-                        <h4 className="text-sm font-semibold text-white mb-4">Resources</h4>
+                        <h4 className="text-sm font-semibold text-foreground mb-4">Resources</h4>
                         <ul className="space-y-3">
                             {footerLinks.resources.map((link) => (
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-sm text-gray-400 hover:text-white transition-colors"
+                                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                                     >
                                         {link.name}
                                     </Link>
@@ -170,13 +170,13 @@ export const Footer = () => {
                     </div>
 
                     <div>
-                        <h4 className="text-sm font-semibold text-white mb-4">Company</h4>
+                        <h4 className="text-sm font-semibold text-foreground mb-4">Company</h4>
                         <ul className="space-y-3">
                             {footerLinks.company.map((link) => (
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-sm text-gray-400 hover:text-white transition-colors"
+                                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                                     >
                                         {link.name}
                                     </Link>
@@ -187,8 +187,8 @@ export const Footer = () => {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-8 border-t border-gray-800/50 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <p className="text-sm text-gray-500">
+                <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <p className="text-sm text-muted-foreground">
                         © 2024 PhantomAgents. All rights reserved.
                     </p>
                     <div className="flex items-center gap-4">
@@ -199,7 +199,7 @@ export const Footer = () => {
                             </span>
                             All systems operational
                         </span>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                             Powered by StarkNet
                         </span>
                     </div>

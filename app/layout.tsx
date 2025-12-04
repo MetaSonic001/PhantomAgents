@@ -37,9 +37,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${_geist.className} dark`} style={{ colorScheme: "dark" }}>
+    <html lang="en" className={`${_geist.className}`} suppressHydrationWarning>
       <body className={`antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="dark">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {children}
         </ThemeProvider>
         <Analytics />

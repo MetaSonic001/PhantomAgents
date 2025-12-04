@@ -85,7 +85,7 @@ const FeatureCard = ({
             />
 
             {/* Card */}
-            <div className="relative h-full p-8 rounded-2xl bg-gradient-to-br from-gray-900/80 to-gray-800/50 border border-gray-800 backdrop-blur-xl hover:border-gray-700 transition-all duration-500 overflow-hidden">
+            <div className="relative h-full p-8 rounded-2xl bg-card border border-border backdrop-blur-xl hover:border-border transition-all duration-500 overflow-hidden">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-5">
                     <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -107,17 +107,17 @@ const FeatureCard = ({
                 <div
                     className={`relative inline-flex p-4 rounded-xl bg-gradient-to-br ${feature.gradient} mb-6 shadow-lg`}
                 >
-                    <Icon className="w-7 h-7 text-white" stroke={1.5} />
+                    <Icon className="w-7 h-7 text-primary-foreground" stroke={1.5} />
                     <div
                         className={`absolute inset-0 rounded-xl bg-gradient-to-br ${feature.gradient} blur-xl opacity-50`}
                     />
                 </div>
 
                 {/* Content */}
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-white group-hover:to-gray-300 transition-all duration-300">
+                <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-foreground group-hover:to-muted-foreground transition-all duration-300">
                     {feature.title}
                 </h3>
-                <p className="text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
+                <p className="text-muted-foreground leading-relaxed group-hover:text-foreground transition-colors duration-300">
                     {feature.description}
                 </p>
 
@@ -135,7 +135,7 @@ const FeatureCard = ({
 
 export const Features = () => {
     return (
-        <section className="relative py-32 bg-[#030014] overflow-hidden">
+        <section className="relative py-32 bg-background overflow-hidden">
             {/* Background Elements */}
             <div className="absolute inset-0">
                 <div className="absolute top-1/4 left-0 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl" />
@@ -155,14 +155,14 @@ export const Features = () => {
                         Core Features
                     </span>
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                        <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
                             Why Choose{" "}
                         </span>
                         <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
                             PhantomAgents
                         </span>
                     </h2>
-                    <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                         The first platform combining private AI execution with on-chain
                         verifiability. Build trust without exposing your secrets.
                     </p>

@@ -50,7 +50,7 @@ const useCases = [
 
 export const UseCases = () => {
     return (
-        <section className="relative py-32 bg-gradient-to-b from-[#030014] to-[#0a0520] overflow-hidden">
+        <section className="relative py-32 bg-background overflow-hidden">
             {/* Background Grid */}
             <div className="absolute inset-0 opacity-20">
                 <div
@@ -90,14 +90,12 @@ export const UseCases = () => {
                         Use Cases
                     </span>
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                        <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                            Built For{" "}
-                        </span>
+                        
                         <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
-                            Every Builder
+                        Built For Every Builder
                         </span>
                     </h2>
-                    <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                         From DAOs to traders, researchers to identity builders — see how
                         teams are using PhantomAgents to build the future.
                     </p>
@@ -119,20 +117,20 @@ export const UseCases = () => {
                                 className={`absolute -inset-0.5 bg-gradient-to-r ${useCase.gradient} rounded-2xl opacity-0 group-hover:opacity-30 blur-xl transition-all duration-500`}
                             />
 
-                            <div className="relative h-full p-6 rounded-2xl bg-gray-900/60 border border-gray-800 backdrop-blur-xl hover:border-gray-700 transition-all duration-300 overflow-hidden">
+                            <div className="relative h-full p-6 rounded-2xl bg-card border border-border backdrop-blur-xl hover:border-border transition-all duration-300 overflow-hidden">
                                 {/* Icon & Badge */}
                                 <div className="flex items-start justify-between mb-4">
                                     <span className="text-4xl">{useCase.icon}</span>
-                                    <span className="px-3 py-1 rounded-full bg-gray-800/80 text-xs text-gray-400 font-medium">
+                                    <span className="px-3 py-1 rounded-full bg-secondary text-xs text-muted-foreground font-medium">
                                         {useCase.users} users
                                     </span>
                                 </div>
 
                                 {/* Content */}
-                                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-violet-300 transition-colors">
+                                <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-violet-600 transition-colors">
                                     {useCase.title}
                                 </h3>
-                                <p className="text-gray-400 text-sm leading-relaxed">
+                                <p className="text-muted-foreground text-sm leading-relaxed">
                                     {useCase.description}
                                 </p>
 

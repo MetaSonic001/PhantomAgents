@@ -93,7 +93,7 @@ const StepCard = ({
         >
             {/* Node on Timeline */}
             <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-cyan-500 items-center justify-center z-10">
-                <div className="w-3 h-3 rounded-full bg-[#030014]" />
+                <div className="w-3 h-3 rounded-full bg-background" />
             </div>
 
             {/* Card */}
@@ -101,9 +101,9 @@ const StepCard = ({
                 {/* Glow */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/20 to-cyan-600/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                <div className="relative p-8 rounded-2xl bg-gradient-to-br from-gray-900/90 to-gray-800/50 border border-gray-800 backdrop-blur-xl hover:border-violet-500/30 transition-all duration-300">
+                <div className="relative p-8 rounded-2xl bg-card border border-border backdrop-blur-xl hover:border-violet-500/30 transition-all duration-300">
                     {/* Step Number */}
-                    <div className="absolute -top-4 -left-4 w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-violet-500/20">
+                    <div className="absolute -top-4 -left-4 w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center font-bold text-primary-foreground text-lg shadow-lg shadow-violet-500/20">
                         {step.number}
                     </div>
 
@@ -111,8 +111,8 @@ const StepCard = ({
                     <div className="mb-4 text-violet-400">{step.icon}</div>
 
                     {/* Content */}
-                    <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>
-                    <p className="text-gray-400 leading-relaxed">{step.description}</p>
+                    <h3 className="text-xl font-bold text-foreground mb-3">{step.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{step.description}</p>
                 </div>
             </div>
         </motion.div>
@@ -121,11 +121,11 @@ const StepCard = ({
 
 export const HowItWorks = () => {
     return (
-        <section className="relative py-32 bg-[#030014] overflow-hidden">
+        <section className="relative py-32 bg-background overflow-hidden">
             {/* Background */}
             <div className="absolute inset-0">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-gray-800 to-transparent" />
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-gray-800 to-transparent" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-6">
@@ -141,14 +141,14 @@ export const HowItWorks = () => {
                         How It Works
                     </span>
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                        <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
                             From Idea to{" "}
                         </span>
                         <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
                             Verified Agent
                         </span>
                     </h2>
-                    <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                         Five simple steps to create, deploy, and monetize your private AI
                         agents with full on-chain verification.
                     </p>

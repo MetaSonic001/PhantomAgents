@@ -71,15 +71,15 @@ export function Sidebar() {
       initial={{ x: -12, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.45, ease: "easeOut" }}
-      className="w-64 border-r border-gray-800 bg-gray-900 fixed left-0 top-0 h-screen flex flex-col overflow-hidden"
+      className="w-64 border-r border-sidebar-border/80 bg-sidebar/60 backdrop-blur-xl text-sidebar-foreground fixed left-0 top-0 h-screen flex flex-col overflow-hidden"
     >
       {/* Logo */}
-      <div className="p-6 border-b border-gray-800 shrink-0">
+      <div className="p-6 border-b border-sidebar-border shrink-0">
         <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition">
           <div className="w-8 h-8 bg-linear-to-br from-violet-600 to-indigo-600 rounded-md flex items-center justify-center">
-            <span className="text-xs font-bold text-white">PA</span>
+            <span className="text-xs font-bold text-primary-foreground">PA</span>
           </div>
-          <span className="font-semibold text-white">PhantomAgents</span>
+          <span className="font-semibold text-sidebar-foreground">PhantomAgents</span>
         </Link>
       </div>
 
@@ -105,8 +105,8 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium transition",
                   isActive
-                    ? "bg-gray-800 text-white"
-                    : "text-gray-300 hover:bg-gray-800 hover:text-white",
+                    ? "bg-secondary text-foreground"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                 )}
               >
                 <item.icon className="w-4 h-4" />
@@ -121,8 +121,8 @@ export function Sidebar() {
                     className={cn(
                       "text-xs px-2 py-1 rounded-md transition whitespace-nowrap",
                       pathname === "/dashboard/agents" || pathname.startsWith("/dashboard/agents/")
-                        ? "text-white"
-                        : "text-gray-400 hover:text-gray-300",
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                   >
                     Overview
@@ -132,8 +132,8 @@ export function Sidebar() {
                     className={cn(
                       "text-xs px-2 py-1 rounded-md transition whitespace-nowrap",
                       pathname === "/dashboard/agent-runs" || pathname.startsWith("/dashboard/agents/runs")
-                        ? "text-white"
-                        : "text-gray-400 hover:text-gray-300",
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                   >
                     Runs
@@ -143,8 +143,8 @@ export function Sidebar() {
                     className={cn(
                       "text-xs px-2 py-1 rounded-md transition whitespace-nowrap",
                       pathname === "/dashboard/agent-network" || pathname.startsWith("/dashboard/agents/network")
-                        ? "text-white"
-                        : "text-gray-400 hover:text-gray-300",
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                   >
                     Network
@@ -156,8 +156,8 @@ export function Sidebar() {
         })}
 
         {/* Operations Section */}
-        <div className="pt-2 mt-4 border-t border-gray-800">
-          <p className="text-xs font-semibold text-gray-500 px-4 py-2 uppercase">Operations</p>
+        <div className="pt-2 mt-4 border-t border-sidebar-border">
+          <p className="text-xs font-semibold text-muted-foreground px-4 py-2 uppercase">Operations</p>
           {additionalItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
             return (
@@ -167,8 +167,8 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium transition",
                   isActive
-                    ? "bg-gray-800 text-white"
-                    : "text-gray-300 hover:bg-gray-800 hover:text-white",
+                    ? "bg-secondary text-foreground"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                 )}
               >
                 <item.icon className="w-4 h-4" />
@@ -179,8 +179,8 @@ export function Sidebar() {
         </div>
 
         {/* Advanced Section */}
-        <div className="pt-2 mt-4 border-t border-gray-800">
-          <p className="text-xs font-semibold text-gray-500 px-4 py-2 uppercase">Advanced</p>
+        <div className="pt-2 mt-4 border-t border-sidebar-border">
+          <p className="text-xs font-semibold text-muted-foreground px-4 py-2 uppercase">Advanced</p>
           {advancedItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
             return (
@@ -190,8 +190,8 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium transition",
                   isActive
-                    ? "bg-gray-800 text-white"
-                    : "text-gray-300 hover:bg-gray-800 hover:text-white",
+                    ? "bg-secondary text-foreground"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                 )}
               >
                 <item.icon className="w-4 h-4" />
@@ -203,7 +203,7 @@ export function Sidebar() {
       </nav>
 
       {/* Secondary Navigation */}
-      <div className="border-t border-gray-800 p-4 shrink-0 space-y-2">
+      <div className="border-t border-sidebar-border p-4 shrink-0 space-y-2">
         {secondaryItems.map((item) => {
           const isActive = pathname === item.href
           return (
@@ -213,8 +213,8 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium transition",
                 isActive
-                  ? "bg-gray-800 text-white"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white",
+                  ? "bg-secondary text-foreground"
+                  : "text-muted-foreground hover:bg-secondary hover:text-foreground",
               )}
             >
               <item.icon className="w-4 h-4" />
@@ -225,12 +225,12 @@ export function Sidebar() {
       </div>
 
       {/* User Profile */}
-      <div className="border-t border-gray-800 p-4 shrink-0">
+      <div className="border-t border-sidebar-border p-4 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gray-800 rounded-full"></div>
+          <div className="w-8 h-8 bg-secondary rounded-full"></div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">You</p>
-            <p className="text-xs text-gray-400 truncate">user@phantom.ai</p>
+            <p className="text-sm font-medium text-foreground truncate">You</p>
+            <p className="text-xs text-muted-foreground truncate">user@phantom.ai</p>
           </div>
         </div>
       </div>

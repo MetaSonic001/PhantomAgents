@@ -144,7 +144,7 @@ export default function BuilderPage() {
   }
 
   return (
-    <div className="relative flex h-screen bg-[#030014]">
+    <div className="relative flex h-screen bg-background">
       <AmbientBackground />
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden ml-64" onKeyDown={handleKeyDown}>

@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export const CTA = () => {
     return (
-        <section className="relative py-32 bg-[#030014] overflow-hidden">
+        <section className="relative py-32 bg-background overflow-hidden">
             {/* Background Effects */}
             <div className="absolute inset-0">
                 {/* Gradient Orbs */}
@@ -80,7 +80,7 @@ export const CTA = () => {
 
                     {/* Heading */}
                     <h2 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-6 leading-tight">
-                        <span className="bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-foreground via-muted-foreground to-muted-foreground bg-clip-text text-transparent">
                             Ready to Build the
                         </span>
                         <br />
@@ -90,7 +90,7 @@ export const CTA = () => {
                     </h2>
 
                     {/* Subtitle */}
-                    <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
+                    <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
                         Join the pioneers building verifiable AI agents. Start with our
                         free tier — no credit card required.
                     </p>
@@ -123,7 +123,7 @@ export const CTA = () => {
                         </Link>
                         <Link
                             href="#docs"
-                            className="group px-10 py-5 rounded-2xl border border-gray-700 text-gray-300 font-semibold text-lg backdrop-blur-sm hover:border-violet-500/50 hover:text-white hover:bg-violet-500/10 transition-all duration-300"
+                            className="group px-10 py-5 rounded-2xl border border-border text-muted-foreground font-semibold text-lg backdrop-blur-sm hover:border-violet-500/50 hover:text-foreground hover:bg-violet-500/10 transition-all duration-300"
                         >
                             <span className="flex items-center gap-3">
                                 Read Documentation
@@ -145,7 +145,7 @@ export const CTA = () => {
                     </div>
 
                     {/* Trust Indicators */}
-                    <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-500">
+                    <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                             <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
