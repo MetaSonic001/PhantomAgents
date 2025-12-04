@@ -37,9 +37,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${_geist.className} light`} style={{ colorScheme: "light" }}>
+    <html lang="en" className={`${_geist.className} dark`} style={{ colorScheme: "dark" }}>
       <body className={`antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="light">
+        <ThemeProvider attribute="class" defaultTheme="dark">
           {children}
         </ThemeProvider>
         <Analytics />
