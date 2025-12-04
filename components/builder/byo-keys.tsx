@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { GlassSelect } from "@/components/ui/glass-select"
 
 type Provider = "groqcloud" | "gemini"
 
@@ -61,31 +62,37 @@ export default function BYOKeys({ agentName }: { agentName?: string }) {
         <label className="text-xs">Provider</label>
         <label className="text-xs">Model</label>
 
-        <select value={provider} onChange={(e) => setProvider(e.target.value as Provider)} className="px-3 py-2 border rounded-md">
-          <option value="groqcloud">GroqCloud</option>
-          <option value="gemini">Gemini</option>
-        </select>
+        <GlassSelect
+          value={provider}
+          onChange={(v) => setProvider(v as Provider)}
+          options={[
+            { value: "groqcloud", label: "GroqCloud" },
+            { value: "gemini", label: "Gemini" },
+          ]}
+        />
 
-        <select value={model} onChange={(e) => setModel(e.target.value)} className="px-3 py-2 border rounded-md">
-          {provider === "groqcloud" ? (
-            <>
-              <option value="">Select Groq model</option>
-              <option value="groq-1">groq-1</option>
-              <option value="groq-1-mini">groq-1-mini</option>
-            </>
-          ) : (
-            <>
-              <option value="">Select Gemini model</option>
-              <option value="gemini-1.5">gemini-1.5</option>
-              <option value="gemini-pro">gemini-pro</option>
-            </>
-          )}
-        </select>
+        <GlassSelect
+          value={model}
+          onChange={setModel}
+          options={
+            provider === "groqcloud"
+              ? [
+                  { value: "", label: "Select Groq model" },
+                  { value: "groq-1", label: "groq-1" },
+                  { value: "groq-1-mini", label: "groq-1-mini" },
+                ]
+              : [
+                  { value: "", label: "Select Gemini model" },
+                  { value: "gemini-1.5", label: "gemini-1.5" },
+                  { value: "gemini-pro", label: "gemini-pro" },
+                ]
+          }
+        />
       </div>
 
       <div>
         <label className="text-xs">API Key</label>
-        <input value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="sk-..." className="w-full px-3 py-2 border rounded-md font-mono" />
+        <input value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="sk-..." className="glass-input font-mono" />
       </div>
 
       <div className="flex items-center gap-2">

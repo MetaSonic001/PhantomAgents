@@ -9,6 +9,7 @@ import AmbientBackground from "@/components/ambient"
 import { motion } from "framer-motion"
 import { agentApi } from "@/lib/api-client"
 import { toast } from "@/components/toast"
+import { getLocalAgents } from "@/lib/local-agents"
 
 export default function MyAgentsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -22,10 +23,10 @@ export default function MyAgentsPage() {
   useEffect(() => {
     async function loadAgents() {
       try {
-        const response = await agentApi.getAll()
+        const response = await agentApi.getAll().catch(() => ({ agents: [] }))
         const agentsList = response.agents || []
-        // Map to UI format
-        const mapped = agentsList.map((agent: any) => ({
+        // Map API agents to UI format
+        const mappedFromApi = agentsList.map((agent: any) => ({
           id: agent.id,
           name: agent.name,
           type: agent.description || "AI Agent",
@@ -37,7 +38,20 @@ export default function MyAgentsPage() {
           revenue: agent.revenue || 0,
           private: agent.visibility === "private",
         }))
-        setAgents(mapped)
+        // Merge local agents created via builder
+        const local = getLocalAgents().map((local) => ({
+          id: local.id,
+          name: local.agentData.name,
+          type: local.agentData.type || "AI Agent",
+          status: "active",
+          created: new Date(local.saved_at || new Date().toISOString()).toLocaleDateString(),
+          lastModified: new Date(local.saved_at || new Date().toISOString()).toLocaleDateString(),
+          performance: "-",
+          subscribers: 0,
+          revenue: 0,
+          private: local.agentData.visibility !== "public",
+        }))
+        setAgents([...mappedFromApi, ...local])
       } catch (error) {
         console.error("Failed to load agents:", error)
       } finally {

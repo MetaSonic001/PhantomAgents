@@ -6,6 +6,37 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import { agentApi, demoApi } from "@/lib/api-client"
 import { toast } from "@/components/toast"
+import { getLocalAgents } from "@/lib/local-agents"
+
+const DEMO_AGENTS = [
+  {
+    id: "agent_crypto_trader",
+    name: "Crypto Trader Pro",
+    status: "active",
+    lastAction: "5 mins ago",
+    actionsToday: 24,
+    revenue: 2376,
+    type: "Trading Agent",
+  },
+  {
+    id: "agent_market_oracle",
+    name: "Market Oracle",
+    status: "active",
+    lastAction: "12 mins ago",
+    actionsToday: 18,
+    revenue: 890,
+    type: "Prediction Oracle",
+  },
+  {
+    id: "agent_governance",
+    name: "Governance Voter",
+    status: "idle",
+    lastAction: "1 hour ago",
+    actionsToday: 4,
+    revenue: 588,
+    type: "Governance Delegate",
+  },
+]
 
 export default function DashboardPage() {
   const [agents, setAgents] = useState<any[]>([])
@@ -17,11 +48,11 @@ export default function DashboardPage() {
     async function loadDashboardData() {
       try {
         // Load agents
-        const response = await agentApi.getAll()
+        const response = await agentApi.getAll().catch(() => ({ agents: [] }))
         const agentsList = response.agents || []
-        
+
         // Map backend agents to dashboard format
-        const mapped = agentsList.map((agent: any) => ({
+        const mappedFromApi = agentsList.map((agent: any) => ({
           id: agent.id,
           name: agent.name,
           status: agent.status === "registered" ? "active" : "idle",
@@ -30,13 +61,26 @@ export default function DashboardPage() {
           revenue: agent.revenue || 0,
           type: agent.description || "AI Agent",
         }))
-        setAgents(mapped)
+
+        // Merge local agents created via builder
+        const local = getLocalAgents().map((local) => ({
+          id: local.id,
+          name: local.agentData.name,
+          status: "active",
+          lastAction: "Just now",
+          actionsToday: 0,
+          revenue: 0,
+          type: local.agentData.type || "AI Agent",
+        }))
+
+        const combined = [...mappedFromApi, ...local]
+        setAgents(combined.length ? combined : DEMO_AGENTS)
 
         // Load recent activities from backend
         const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
         try {
           // Get actions from all agents
-          const activityPromises = mapped.slice(0, 3).map(async (agent: any) => {
+          const activityPromises = combined.slice(0, 3).map(async (agent: any) => {
             try {
               const actResponse = await fetch(`${BASE_URL}/agents/${agent.id}/actions`)
               if (actResponse.ok) {
@@ -72,7 +116,22 @@ export default function DashboardPage() {
         }
       } catch (error) {
         console.error("Failed to load agents:", error)
-        toast.error("Failed to load dashboard data")
+        // Fallback to demo + local-only agents
+        const local = getLocalAgents().map((local) => ({
+          id: local.id,
+          name: local.agentData.name,
+          status: "active",
+          lastAction: "Just now",
+          actionsToday: 0,
+          revenue: 0,
+          type: local.agentData.type || "AI Agent",
+        }))
+        const combined = [...local, ...DEMO_AGENTS]
+        setAgents(combined)
+        setActivities([
+          { agent: "System", action: "Using offline demo data", type: "success", time: "Just now" },
+        ])
+        toast.warning("Backend unavailable. Showing demo data.")
       } finally {
         setLoading(false)
       }
@@ -83,9 +142,9 @@ export default function DashboardPage() {
   const refreshDashboard = async () => {
     setLoading(true)
     try {
-      const response = await agentApi.getAll()
+      const response = await agentApi.getAll().catch(() => ({ agents: [] }))
       const agentsList = response.agents || []
-      const mapped = agentsList.map((agent: any) => ({
+      const mappedFromApi = agentsList.map((agent: any) => ({
         id: agent.id,
         name: agent.name,
         status: agent.status === "registered" ? "active" : "idle",
@@ -94,7 +153,17 @@ export default function DashboardPage() {
         revenue: agent.revenue || 0,
         type: agent.description || "AI Agent",
       }))
-      setAgents(mapped)
+      const local = getLocalAgents().map((local) => ({
+        id: local.id,
+        name: local.agentData.name,
+        status: "active",
+        lastAction: "Just now",
+        actionsToday: 0,
+        revenue: 0,
+        type: local.agentData.type || "AI Agent",
+      }))
+      const combined = [...mappedFromApi, ...local]
+      setAgents(combined.length ? combined : DEMO_AGENTS)
       toast.success("Dashboard refreshed!")
     } catch (error) {
       console.error("Failed to refresh:", error)

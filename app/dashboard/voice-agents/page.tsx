@@ -52,14 +52,16 @@ export default function VoiceAgentsPage() {
   return (
     <div className="p-8 space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-white">Voice Agents & Telephony</h1>
-        <p className="text-gray-400">Create AI agents with natural voice interactions and phone integration</p>
+        <h1 className="text-3xl font-bold text-foreground">Voice Agents & Telephony</h1>
+        <p className="text-muted-foreground">
+          Create AI agents with natural voice interactions and phone integration
+        </p>
       </div>
 
       {/* Voice Personality Designer */}
-      <div className="border border-gray-800 rounded-lg bg-linear-to-br from-gray-900/50 to-gray-800/30 p-6 backdrop-blur-sm">
-        <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-white">
-          <Volume2 className="w-5 h-5 text-gray-300" />
+      <div className="border border-border rounded-2xl bg-card/90 p-6 backdrop-blur-xl">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-foreground">
+          <Volume2 className="w-5 h-5 text-muted-foreground" />
           Voice Personality Designer
         </h2>
 
@@ -70,7 +72,7 @@ export default function VoiceAgentsPage() {
               <select
                 value={voicePersonality.accent}
                 onChange={(e) => setVoicePersonality({ ...voicePersonality, accent: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-700 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                className="w-full px-4 py-2 border border-border rounded-md bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/60"
               >
                 <option>US English</option>
                 <option>UK English</option>
@@ -84,7 +86,7 @@ export default function VoiceAgentsPage() {
               <select
                 value={voicePersonality.tone}
                 onChange={(e) => setVoicePersonality({ ...voicePersonality, tone: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-700 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                className="w-full px-4 py-2 border border-border rounded-md bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/60"
               >
                 <option>Professional</option>
                 <option>Friendly</option>
@@ -98,7 +100,7 @@ export default function VoiceAgentsPage() {
               <select
                 value={voicePersonality.pace}
                 onChange={(e) => setVoicePersonality({ ...voicePersonality, pace: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-700 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                className="w-full px-4 py-2 border border-border rounded-md bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/60"
               >
                 <option>Slow</option>
                 <option>Moderate</option>
@@ -112,7 +114,7 @@ export default function VoiceAgentsPage() {
               <select
                 value={voicePersonality.gender}
                 onChange={(e) => setVoicePersonality({ ...voicePersonality, gender: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-700 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                className="w-full px-4 py-2 border border-border rounded-md bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/60"
               >
                 <option>Female</option>
                 <option>Male</option>
@@ -122,13 +124,13 @@ export default function VoiceAgentsPage() {
           </div>
 
           <div className="space-y-4">
-            <div className="bg-gray-800/30 p-4 rounded-lg text-center">
-              <Mic className="w-12 h-12 mx-auto mb-3 text-violet-400" />
-              <p className="font-semibold mb-2 text-white">Voice Preview</p>
-              <button className="px-6 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition font-medium mb-3">
+            <div className="border border-border bg-card p-4 rounded-lg text-center">
+              <Mic className="w-12 h-12 mx-auto mb-3 text-primary" />
+              <p className="font-semibold mb-2 text-foreground">Voice Preview</p>
+              <button className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition font-medium mb-3">
                 Play Sample
               </button>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 {voicePersonality.accent} • {voicePersonality.tone} • {voicePersonality.pace}
               </p>
             </div>
@@ -141,7 +143,7 @@ export default function VoiceAgentsPage() {
                   onChange={(e) => setVoicePersonality({ ...voicePersonality, emotionDetection: e.target.checked })}
                   className="w-4 h-4"
                 />
-                <span className="text-sm font-medium">Enable Emotion Detection</span>
+                <span className="text-sm font-medium text-foreground">Enable Emotion Detection</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -150,7 +152,7 @@ export default function VoiceAgentsPage() {
                   onChange={(e) => setVoicePersonality({ ...voicePersonality, interruptionHandling: e.target.checked })}
                   className="w-4 h-4"
                 />
-                <span className="text-sm font-medium">Enable Interruption Handling</span>
+                <span className="text-sm font-medium text-foreground">Enable Interruption Handling</span>
               </label>
             </div>
           </div>
@@ -158,25 +160,28 @@ export default function VoiceAgentsPage() {
       </div>
 
       {/* Voice Agents */}
-      <div className="border border-gray-800 rounded-lg bg-linear-to-br from-gray-900/50 to-gray-800/30 p-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
-          <Phone className="w-5 h-5 text-gray-300" />
+      <div className="border border-border rounded-2xl bg-card/90 p-6 backdrop-blur-xl">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-foreground">
+          <Phone className="w-5 h-5 text-muted-foreground" />
           Active Voice Agents
         </h2>
 
         <div className="space-y-4">
           {voiceAgents.map((agent) => (
-            <div key={agent.id} className="border border-gray-800 rounded-lg p-4 hover:border-violet-500/30 transition bg-gray-900/20">
+            <div
+              key={agent.id}
+              className="border border-border rounded-xl p-4 hover:border-primary/40 transition bg-card/90"
+            >
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h3 className="font-semibold text-white">{agent.name}</h3>
-                  <p className="text-xs text-gray-400">
+                  <h3 className="font-semibold text-foreground">{agent.name}</h3>
+                  <p className="text-xs text-muted-foreground">
                     {agent.accent} • {agent.tone} • {agent.gender}
                   </p>
                 </div>
                 <span
                   className={`text-xs px-2 py-1 rounded ${
-                    agent.status === "active" ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"
+                    agent.status === "active" ? "bg-green-500/10 text-green-600" : "bg-yellow-500/10 text-yellow-600"
                   }`}
                 >
                   ● {agent.status}
@@ -184,26 +189,26 @@ export default function VoiceAgentsPage() {
               </div>
 
               <div className="grid grid-cols-3 gap-3 mb-3 text-sm">
-                <div className="bg-gray-800/30 p-2 rounded">
-                  <p className="text-xs text-gray-400">Calls Made</p>
-                  <p className="font-semibold text-white">{agent.calls}</p>
+                <div className="bg-secondary/40 p-2 rounded">
+                  <p className="text-xs text-muted-foreground">Calls Made</p>
+                  <p className="font-semibold text-foreground">{agent.calls}</p>
                 </div>
-                <div className="bg-gray-800/30 p-2 rounded">
-                  <p className="text-xs text-gray-400">Avg Duration</p>
-                  <p className="font-semibold text-white">{agent.avgDuration}</p>
+                <div className="bg-secondary/40 p-2 rounded">
+                  <p className="text-xs text-muted-foreground">Avg Duration</p>
+                  <p className="font-semibold text-foreground">{agent.avgDuration}</p>
                 </div>
-                <div className="bg-gray-800/30 p-2 rounded">
-                  <p className="text-xs text-gray-400">Pace</p>
-                  <p className="font-semibold text-white">{agent.pace}</p>
+                <div className="bg-secondary/40 p-2 rounded">
+                  <p className="text-xs text-muted-foreground">Pace</p>
+                  <p className="font-semibold text-foreground">{agent.pace}</p>
                 </div>
               </div>
 
               <div className="flex gap-2">
-                <button className="flex-1 px-3 py-2 border border-gray-700 rounded-md hover:bg-gray-800 transition text-sm font-medium text-gray-300">
+                <button className="flex-1 px-3 py-2 border border-border rounded-md hover:bg-secondary transition text-sm font-medium text-muted-foreground">
                   <Phone className="w-4 h-4 inline mr-2" />
                   Call Log
                 </button>
-                <button className="flex-1 px-3 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition text-sm font-medium">
+                <button className="flex-1 px-3 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition text-sm font-medium">
                   Configure
                 </button>
               </div>
@@ -213,7 +218,7 @@ export default function VoiceAgentsPage() {
       </div>
 
       {/* IVR Builder */}
-      <div className="border border-border rounded-lg bg-card p-6">
+      <div className="border border-border rounded-2xl bg-card p-6">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <MessageSquare className="w-5 h-5" />
           IVR Phone Tree Builder

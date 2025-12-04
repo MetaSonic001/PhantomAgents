@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { ChevronDown } from "lucide-react"
+import { GlassSelect } from "@/components/ui/glass-select"
 
 const CAPABILITIES = [
   { id: "predictions", name: "Predictions & Forecasting", icon: "🔮" },
@@ -19,6 +20,7 @@ export interface CapabilitiesPanelProps {
 export function CapabilitiesPanel({ onComplete }: CapabilitiesPanelProps) {
   const [enabledCapabilities, setEnabledCapabilities] = useState<Record<string, boolean>>({})
   const [expandedCapability, setExpandedCapability] = useState<string | null>(null)
+  const [riskTolerance, setRiskTolerance] = useState("Conservative")
 
   const toggleCapability = (id: string) => {
     setEnabledCapabilities((prev) => ({
@@ -31,12 +33,12 @@ export function CapabilitiesPanel({ onComplete }: CapabilitiesPanelProps) {
   const isValid = Object.values(enabledCapabilities).some((v) => v)
 
   return (
-    <div className="max-w-2xl">
-      <h2 className="text-2xl font-bold mb-6">Capabilities & Actions</h2>
+    <div className="max-w-2xl space-y-6">
+      <h2 className="text-2xl font-bold">Capabilities & Actions</h2>
 
-      <div className="space-y-4 mb-6">
+      <div className="space-y-4">
         {CAPABILITIES.map((capability) => (
-          <div key={capability.id} className="border border-border rounded-lg overflow-hidden bg-card">
+          <div key={capability.id} className="glass-card overflow-hidden">
             <button
               onClick={() => toggleCapability(capability.id)}
               className="w-full flex items-center justify-between px-6 py-4 hover:bg-secondary/50 transition"
@@ -66,9 +68,9 @@ export function CapabilitiesPanel({ onComplete }: CapabilitiesPanelProps) {
                       <label className="text-sm font-medium block mb-2">Prediction Categories</label>
                       <div className="space-y-2">
                         {["Crypto", "Stocks", "Events", "Sports", "Politics"].map((cat) => (
-                          <label key={cat} className="flex items-center gap-2">
+                          <label key={cat} className="flex items-center gap-2 text-sm">
                             <input type="checkbox" className="w-4 h-4" />
-                            <span className="text-sm">{cat}</span>
+                            <span>{cat}</span>
                           </label>
                         ))}
                       </div>
@@ -85,20 +87,24 @@ export function CapabilitiesPanel({ onComplete }: CapabilitiesPanelProps) {
                       <label className="text-sm font-medium block mb-2">Signal Types</label>
                       <div className="space-y-2">
                         {["Long", "Short", "Neutral", "Buy", "Sell"].map((sig) => (
-                          <label key={sig} className="flex items-center gap-2">
+                          <label key={sig} className="flex items-center gap-2 text-sm">
                             <input type="checkbox" className="w-4 h-4" />
-                            <span className="text-sm">{sig}</span>
+                            <span>{sig}</span>
                           </label>
                         ))}
                       </div>
                     </div>
                     <div>
                       <label className="text-sm font-medium block mb-2">Risk Tolerance</label>
-                      <select className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm">
-                        <option>Conservative</option>
-                        <option>Moderate</option>
-                        <option>Aggressive</option>
-                      </select>
+                      <GlassSelect
+                        value={riskTolerance}
+                        onChange={setRiskTolerance}
+                        options={[
+                          { value: "Conservative", label: "Conservative" },
+                          { value: "Moderate", label: "Moderate" },
+                          { value: "Aggressive", label: "Aggressive" },
+                        ]}
+                      />
                     </div>
                   </>
                 )}

@@ -57,7 +57,7 @@ export default function VersionControlPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Version History */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="border border-gray-800 rounded-lg p-6 bg-linear-to-br from-gray-900/50 to-gray-800/30">
+          <div className="border border-gray-800 rounded-lg p-6 bg-linear-to-br from-white-900/50 to-white-800/30">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <GitBranch className="w-5 h-5" />
               Version History
@@ -65,18 +65,18 @@ export default function VersionControlPage() {
 
             <div className="space-y-3">
               {mockVersions.map((ver) => (
-                <div key={ver.id} className="p-4 border border-gray-800 rounded-lg hover:bg-gray-800/30 transition">
+                <div key={ver.id} className="p-4 border border-gray-800 rounded-lg hover:bg-purple-800/30 transition">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
                         <span className="font-semibold">{ver.version}</span>
                         {ver.tag && (
-                          <span className="text-xs px-2 py-1 bg-violet-500/10 text-violet-400 rounded">{ver.tag}</span>
+                          <span className="text-xs px-2 py-1 bg-violet-100 text-violet-400 rounded">{ver.tag}</span>
                         )}
                       </div>
                       <span
                         className={`text-xs px-2 py-1 rounded ${
-                          ver.status === "production" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
+                          ver.status === "production" ? "bg-green-100 text-green-700" : "bg-blue-100 text-gray-700"
                         }`}
                       >
                         {ver.status}
@@ -89,7 +89,7 @@ export default function VersionControlPage() {
 
                   <div className="flex flex-wrap gap-1">
                     {ver.changes.map((change, idx) => (
-                      <span key={idx} className="text-xs px-2 py-1 bg-gray-800/30 rounded text-gray-300">
+                      <span key={idx} className="text-xs px-2 py-1 bg-yellow-800/30 rounded text-white-300">
                         {change}
                       </span>
                     ))}

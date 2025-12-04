@@ -19,6 +19,7 @@ import ExposureRules from "@/components/builder/exposure-rules"
 import BYOKeys from "@/components/builder/byo-keys"
 import Animated from "@/components/Animated"
 import AmbientBackground from "@/components/ambient"
+import { toast } from "@/components/toast"
 
 const BUILDER_SECTIONS = [
   { id: "identity", label: "Identity & Profile", icon: "👤", description: "Define your agent's name, personality, and core identity", badge: "BASIC" },
@@ -58,6 +59,21 @@ export default function BuilderPage() {
   })
   const [completedSections, setCompletedSections] = useState<string[]>(["identity"])
 
+  const persistLocalAgent = (agentId: string, agent: AgentData, onChain?: any) => {
+    try {
+      const key = "phantom.seller.listings"
+      const existing = JSON.parse(localStorage.getItem(key) || "[]")
+      existing.push({
+        id: agentId,
+        agentData: agent,
+        onChain,
+        saved_at: new Date().toISOString(),
+      })
+      localStorage.setItem(key, JSON.stringify(existing))
+    } catch (error) {
+      console.warn("Failed to persist agent locally", error)
+    }
+  }
   const handleSectionComplete = (sectionId: string) => {
     if (!completedSections.includes(sectionId)) {
       setCompletedSections([...completedSections, sectionId])
@@ -175,7 +191,7 @@ export default function BuilderPage() {
           </div>
 
           {/* Main Content Area */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-white/50 via-transparent to-white/10 dark:from-white/10 dark:via-transparent dark:to-white/5">
+          <div className="flex-1 flex flex-col overflow-hidden bg-linear-to-br from-white/50 via-transparent to-white/10 dark:from-white/10 dark:via-transparent dark:to-white/5">
             {/* Header */}
             <div className={`${glassPanel} border-b border-white/10 px-8 py-6`}>
               <div className="flex items-start justify-between">
@@ -210,11 +226,23 @@ export default function BuilderPage() {
                           visibility: agentData.visibility,
                           pricing: null,
                         })
+
                         const regRes: any = await agentApi.register(createRes.agent_id)
-                        setRegisteredInfo({ ...regRes, agent_id: createRes.agent_id })
-                      } catch (err) {
-                        console.error(err)
-                        alert("Failed to register agent: " + String(err))
+                        const combined = { ...regRes, agent_id: createRes.agent_id }
+                        setRegisteredInfo(combined)
+                        persistLocalAgent(createRes.agent_id, agentData, combined)
+                        toast.success("✅ Agent registered on mock chain")
+                      } catch (err: any) {
+                        console.error("Register agent failed", err)
+                        const fallbackId = `local-${Date.now()}`
+                        const localInfo = {
+                          agent_id: fallbackId,
+                          message: "Saved locally (offline)",
+                          tx_hash: null,
+                        }
+                        setRegisteredInfo(localInfo)
+                        persistLocalAgent(fallbackId, agentData, localInfo)
+                        toast.warning("Backend unavailable. Agent stored locally for now.")
                       } finally {
                         setRegistering(false)
                       }

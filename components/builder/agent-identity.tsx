@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { CheckCircle2, Copy } from "lucide-react"
+import { GlassSelect } from "@/components/ui/glass-select"
 
 export interface AgentIdentityProps {
   data: {
@@ -40,7 +41,7 @@ export function AgentIdentity({ data, onChange, onComplete }: AgentIdentityProps
             value={data.name}
             onChange={(e) => onChange({ ...data, name: e.target.value })}
             maxLength={50}
-            className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+            className="glass-input"
             placeholder="e.g., Crypto Trader Pro"
           />
           <div className="absolute right-3 top-2.5 text-xs text-muted-foreground">{data.name.length}/50</div>
@@ -56,7 +57,7 @@ export function AgentIdentity({ data, onChange, onComplete }: AgentIdentityProps
             type="text"
             value={data.tagline}
             onChange={(e) => onChange({ ...data, tagline: e.target.value.slice(0, maxCharacters) })}
-            className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+            className="glass-input"
             placeholder="Short description of your agent"
           />
           <div className="absolute right-3 top-2.5 text-xs text-muted-foreground">
@@ -72,7 +73,7 @@ export function AgentIdentity({ data, onChange, onComplete }: AgentIdentityProps
         <textarea
           value={data.description}
           onChange={(e) => onChange({ ...data, description: e.target.value })}
-          className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition resize-none"
+          className="glass-input resize-none"
           placeholder="Detailed description of your agent's purpose and capabilities..."
           rows={5}
         ></textarea>
@@ -83,20 +84,20 @@ export function AgentIdentity({ data, onChange, onComplete }: AgentIdentityProps
       <div className="space-y-3">
         <label className="text-sm font-semibold block">Agent Type</label>
         <p className="text-xs text-muted-foreground">Choose the primary category for your agent.</p>
-        <select
+        <GlassSelect
           value={data.type}
-          onChange={(e) => onChange({ ...data, type: e.target.value })}
-          className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
-        >
-          <option>Trading Agent</option>
-          <option>Prediction Oracle</option>
-          <option>Governance Delegate</option>
-          <option>Research Assistant</option>
-          <option>Task Manager</option>
-          <option>Social Agent</option>
-          <option>Customer Support</option>
-          <option>Custom</option>
-        </select>
+          onChange={(value) => onChange({ ...data, type: value })}
+          options={[
+            { value: "Trading Agent", label: "Trading Agent" },
+            { value: "Prediction Oracle", label: "Prediction Oracle" },
+            { value: "Governance Delegate", label: "Governance Delegate" },
+            { value: "Research Assistant", label: "Research Assistant" },
+            { value: "Task Manager", label: "Task Manager" },
+            { value: "Social Agent", label: "Social Agent" },
+            { value: "Customer Support", label: "Customer Support" },
+            { value: "Custom", label: "Custom" },
+          ]}
+        />
       </div>
 
       {/* Personality Traits */}
@@ -115,9 +116,7 @@ export function AgentIdentity({ data, onChange, onComplete }: AgentIdentityProps
                   onChange({ ...data, personality: updated })
                 }}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
-                  data.personality.includes(trait)
-                    ? "bg-primary text-primary-foreground ring-2 ring-primary/50"
-                    : "border border-border hover:bg-secondary/50 text-foreground"
+                  data.personality.includes(trait) ? "glass-chip-active" : "glass-chip"
                 }`}
               >
                 {trait}
@@ -160,7 +159,7 @@ export function AgentIdentity({ data, onChange, onComplete }: AgentIdentityProps
       </div>
 
       {/* Configuration Export */}
-      <div className="border border-border rounded-lg p-4 bg-secondary/30">
+      <div className="glass-card p-4 text-sm">
         <div className="flex items-start justify-between mb-2">
           <h4 className="text-sm font-semibold">Configuration</h4>
           <button

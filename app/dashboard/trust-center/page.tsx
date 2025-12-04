@@ -56,47 +56,49 @@ export default function TrustCenterPage() {
   return (
     <div className="p-8 space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-white">Trust Center</h1>
-        <p className="text-gray-400">Verify agent reliability, audits, and security certifications</p>
+        <h1 className="text-3xl font-bold text-foreground">Trust Center</h1>
+        <p className="text-muted-foreground">
+          Verify agent reliability, audits, and security certifications
+        </p>
       </div>
 
       {/* Trust Metrics Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="border border-gray-800 rounded-lg p-4 bg-linear-to-br from-gray-900/50 to-gray-800/30">
-          <p className="text-xs text-gray-400 mb-1">Total Audits</p>
-          <p className="text-3xl font-bold text-white">{auditDetails.totalAudits}</p>
-          <p className="text-xs text-green-500 mt-1">{auditDetails.passRate}% pass rate</p>
+        <div className="border border-border rounded-lg p-4 bg-card">
+          <p className="text-xs text-muted-foreground mb-1">Total Audits</p>
+          <p className="text-3xl font-bold text-foreground">{auditDetails.totalAudits}</p>
+          <p className="text-xs text-green-600 mt-1">{auditDetails.passRate}% pass rate</p>
         </div>
-        <div className="border border-gray-800 rounded-lg p-4 bg-linear-to-br from-gray-900/50 to-gray-800/30">
-          <p className="text-xs text-gray-400 mb-1">Average Score</p>
-          <p className="text-3xl font-bold text-white">{auditDetails.avgScore}</p>
-          <p className="text-xs text-gray-400 mt-1">Out of 100</p>
+        <div className="border border-border rounded-lg p-4 bg-card">
+          <p className="text-xs text-muted-foreground mb-1">Average Score</p>
+          <p className="text-3xl font-bold text-foreground">{auditDetails.avgScore}</p>
+          <p className="text-xs text-muted-foreground mt-1">Out of 100</p>
         </div>
-        <div className="border border-gray-800 rounded-lg p-4 bg-linear-to-br from-gray-900/50 to-gray-800/30">
-          <p className="text-xs text-gray-400 mb-1">Insured Agents</p>
-          <p className="text-3xl font-bold text-white">156</p>
-          <p className="text-xs text-gray-400 mt-1">In pool</p>
+        <div className="border border-border rounded-lg p-4 bg-card">
+          <p className="text-xs text-muted-foreground mb-1">Insured Agents</p>
+          <p className="text-3xl font-bold text-foreground">156</p>
+          <p className="text-xs text-muted-foreground mt-1">In pool</p>
         </div>
-        <div className="border border-gray-800 rounded-lg p-4 bg-linear-to-br from-gray-900/50 to-gray-800/30">
-          <p className="text-xs text-gray-400 mb-1">Insurance Pool</p>
-          <p className="text-3xl font-bold text-white">$2.3M</p>
-          <p className="text-xs text-green-500 mt-1">Available</p>
+        <div className="border border-border rounded-lg p-4 bg-card">
+          <p className="text-xs text-muted-foreground mb-1">Insurance Pool</p>
+          <p className="text-3xl font-bold text-foreground">$2.3M</p>
+          <p className="text-xs text-green-600 mt-1">Available</p>
         </div>
       </div>
 
       {/* Certifications */}
-      <div className="border border-gray-800 rounded-lg bg-linear-to-br from-gray-900/50 to-gray-800/30 p-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
-          <Award className="w-5 h-5 text-violet-400" />
+      <div className="border border-border rounded-lg bg-card p-6">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-foreground">
+          <Award className="w-5 h-5 text-primary" />
           Platform Certifications
         </h2>
         <div className="grid md:grid-cols-3 gap-4">
           {auditDetails.certifications.map((cert, idx) => (
-            <div key={idx} className="border border-gray-800 rounded-lg p-4 flex items-center gap-3 bg-gray-800/20">
-              <CheckCircle2 className="w-8 h-8 text-green-500 flex-shrink-0" />
+            <div key={idx} className="border border-border rounded-lg p-4 flex items-center gap-3 bg-secondary/30">
+              <CheckCircle2 className="w-8 h-8 text-green-600 shrink-0" />
               <div>
-                <p className="font-semibold text-sm text-white">{cert}</p>
-                <p className="text-xs text-gray-400">Verified</p>
+                <p className="font-semibold text-sm text-foreground">{cert}</p>
+                <p className="text-xs text-muted-foreground">Verified</p>
               </div>
             </div>
           ))}
@@ -104,35 +106,40 @@ export default function TrustCenterPage() {
       </div>
 
       {/* Agent Trust Scores */}
-      <div className="border border-gray-800 rounded-lg bg-linear-to-br from-gray-900/50 to-gray-800/30 p-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
-          <Shield className="w-5 h-5 text-violet-400" />
+      <div className="border border-border rounded-lg bg-card p-6">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-foreground">
+          <Shield className="w-5 h-5 text-primary" />
           Agent Trust Scores
         </h2>
         <div className="space-y-4">
           {agents.map((agent) => (
-            <div key={agent.id} className="border border-gray-800 rounded-lg p-4 hover:border-violet-600/60 transition bg-gray-800/10">
+            <div
+              key={agent.id}
+              className="border border-border rounded-lg p-4 hover:border-primary/50 transition bg-card/90"
+            >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="font-semibold text-white">{agent.name}</h3>
-                  <p className="text-xs text-gray-400">{agent.decisions.toLocaleString()} decisions made</p>
+                  <h3 className="font-semibold text-foreground">{agent.name}</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {agent.decisions.toLocaleString()} decisions made
+                  </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-3xl font-bold text-white">{agent.trustScore}</p>
-                  <p className="text-xs text-gray-400">Trust Score</p>
+                  <p className="text-3xl font-bold text-foreground">{agent.trustScore}</p>
+                  <p className="text-xs text-muted-foreground">Trust Score</p>
                 </div>
               </div>
 
-              <div className="w-full bg-gray-800/30 rounded-full h-2 mb-4">
+              <div className="w-full bg-secondary/40 rounded-full h-2 mb-4">
                 <div
-                  className="bg-violet-500 h-full rounded-full transition-all"
+                  className="bg-primary h-full rounded-full transition-all"
                   style={{ width: `${agent.trustScore}%` }}
                 />
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                 <div>
-                  <p className="text-xs text-gray-400">Risk Level</p>
+                  <p className="text-xs text-muted-foreground">Risk Level</p>
                   <p
                     className={`text-sm font-semibold ${
                       agent.riskLevel === "Low"
@@ -146,33 +153,33 @@ export default function TrustCenterPage() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400">Error Rate</p>
-                  <p className="text-sm font-semibold text-white">{agent.errorRate}%</p>
+                  <p className="text-xs text-muted-foreground">Error Rate</p>
+                  <p className="text-sm font-semibold text-foreground">{agent.errorRate}%</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400">Audited</p>
-                  <p className="text-sm font-semibold text-white">{agent.audited ? "✓ Yes" : "✗ No"}</p>
+                  <p className="text-xs text-muted-foreground">Audited</p>
+                  <p className="text-sm font-semibold text-foreground">{agent.audited ? "✓ Yes" : "✗ No"}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400">Insured</p>
-                  <p className="text-sm font-semibold text-white">{agent.insured ? "✓ Yes" : "✗ No"}</p>
+                  <p className="text-xs text-muted-foreground">Insured</p>
+                  <p className="text-sm font-semibold text-foreground">{agent.insured ? "✓ Yes" : "✗ No"}</p>
                 </div>
               </div>
 
               <div className="flex gap-2 flex-wrap mb-4">
                 {agent.badges.map((badge, idx) => (
-                  <span key={idx} className="text-xs bg-green-500/10 text-green-500 px-2 py-1 rounded">
+                  <span key={idx} className="text-xs bg-green-500/10 text-green-600 px-2 py-1 rounded">
                     {badge}
                   </span>
                 ))}
               </div>
 
               <div className="flex gap-2">
-                <button className="flex-1 px-4 py-2 border border-gray-800 rounded-md hover:bg-gray-800/20 transition text-sm font-medium text-white">
+                <button className="flex-1 px-4 py-2 border border-border rounded-md hover:bg-secondary transition text-sm font-medium text-foreground">
                   View Audit
                 </button>
                 {!agent.insured && (
-                  <button className="flex-1 px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-500/90 transition text-sm font-medium">
+                  <button className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition text-sm font-medium">
                     Get Insurance
                   </button>
                 )}
@@ -183,9 +190,9 @@ export default function TrustCenterPage() {
       </div>
 
       {/* Safety Features */}
-      <div className="border border-gray-800 rounded-lg bg-linear-to-br from-gray-900/50 to-gray-800/30 p-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <AlertTriangle className="w-5 h-5" />
+      <div className="border border-border rounded-lg bg-card p-6">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-foreground">
+          <AlertTriangle className="w-5 h-5 text-yellow-600" />
           Advanced Safety Features
         </h2>
         <div className="grid md:grid-cols-2 gap-4">
@@ -210,11 +217,11 @@ export default function TrustCenterPage() {
               desc: "Every decision shows complete reasoning chain",
               status: "enabled",
             },
-          .map((feature, idx) => (
-            <div key={idx} className="border border-gray-800 rounded-lg p-4 bg-gray-800/10">
-              <h3 className="font-semibold mb-2 text-white">{feature.title}</h3>
-              <p className="text-sm text-gray-400 mb-3">{feature.desc}</p>
-              <span className="text-xs bg-green-500/10 text-green-500 px-2 py-1 rounded">✓ {feature.status}</span>
+          ].map((feature, idx) => (
+            <div key={idx} className="border border-border rounded-lg p-4 bg-secondary/20">
+              <h3 className="font-semibold mb-2 text-foreground">{feature.title}</h3>
+              <p className="text-sm text-muted-foreground mb-3">{feature.desc}</p>
+              <span className="text-xs bg-green-500/10 text-green-600 px-2 py-1 rounded">✓ {feature.status}</span>
             </div>
           ))}
         </div>
