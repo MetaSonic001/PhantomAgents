@@ -24,7 +24,7 @@ export default function MyAgentsPage() {
     async function loadAgents() {
       try {
         const response = await agentApi.getAll().catch(() => ({ agents: [] }))
-        const agentsList = response.agents || []
+        const agentsList = (response as { agents: any[] }).agents || []
         // Map API agents to UI format
         const mappedFromApi = agentsList.map((agent: any) => ({
           id: agent.id,
@@ -78,7 +78,7 @@ export default function MyAgentsPage() {
         const result = await response.json()
         toast.success("✅ Agent executed successfully!")
         // Refresh agents to show updated action count
-        const updated = await agentApi.getAll()
+        const updated = await agentApi.getAll() as { agents: any[] }
         const mapped = updated.agents?.map((agent: any) => ({
           id: agent.id,
           name: agent.name,
