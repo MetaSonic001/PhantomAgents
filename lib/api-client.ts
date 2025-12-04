@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
 export interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE"
@@ -37,7 +37,8 @@ export async function apiCall<T>(endpoint: string, options: RequestOptions = {})
 export const agentApi = {
   getAll: () => apiCall("/agents"),
   getById: (id: string) => apiCall(`/agents/${id}`),
-  create: (data: any) => apiCall("/agents", { method: "POST", body: data }),
+  create: (data: any) => apiCall("/agents/create", { method: "POST", body: data }),
+  register: (id: string) => apiCall(`/agents/${id}/register`, { method: "POST" }),
   update: (id: string, data: any) => apiCall(`/agents/${id}`, { method: "PUT", body: data }),
   delete: (id: string) => apiCall(`/agents/${id}`, { method: "DELETE" }),
 }
@@ -45,10 +46,12 @@ export const agentApi = {
 // Marketplace endpoints
 export const marketplaceApi = {
   getAll: (params?: Record<string, string>) => {
-    const query = new URLSearchParams(params).toString()
-    return apiCall(`/marketplace${query ? "?" + query : ""}`)
+    const query = new URLSearchParams(params || {}).toString()
+    return apiCall(`/marketplace/agents${query ? "?" + query : ""}`)
   },
   getById: (id: string) => apiCall(`/marketplace/${id}`),
+  list: (agent_id: string, price: number) => apiCall(`/marketplace/list`, { method: "POST", body: { agent_id, price } }),
+  subscribe: (agent_id: string) => apiCall(`/marketplace/subscribe`, { method: "POST", body: { agent_id } }),
 }
 
 // Competitions endpoints

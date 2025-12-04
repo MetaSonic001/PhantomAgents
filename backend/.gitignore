@@ -1,0 +1,30 @@
+# Backend-specific ignores
+.env
+.env.*
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+
+
+# Virtualenv and IDE
+.idea/
+.vscode/
+
+# Asyncpg / migrations
+*.db
+
+# Logs
+*.log
+logs/
+
+# Python build
+build/
+dist/
+
+# Ignore compiled artifacts from Noir/Cairo/etc if present
+.nargo/

@@ -60,6 +60,12 @@ coverage-final.json
 local.settings.json
 
 
+# Backend environment and virtualenv
+backend/.env
+backend/.env.*
+backend/.venv/
+backend/__pycache__/
+
 # Build artifacts (Cairo / Noir / generic targets)
 contracts/target/
 circuits/target/

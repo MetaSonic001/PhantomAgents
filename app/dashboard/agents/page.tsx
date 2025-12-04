@@ -3,7 +3,6 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Plus, Grid2x2, List, MoreVertical, Play, Pause, Trash2, Share2, Eye } from "lucide-react"
-import { useAccount, useConnect } from "@starknet-react/core"
 import { signMessageNormalized } from "@/lib/starknet-sign"
 import { Sidebar } from "@/components/sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
@@ -51,8 +50,9 @@ const mockUserAgents = [
 export default function MyAgentsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null)
-  const { account, address } = useAccount() as any
-  const { connect } = useConnect() as any
+  const mockConnected = typeof window !== "undefined" && !!localStorage.getItem("phantom.mock.connected")
+  const account = mockConnected ? "demo_user_account" : null
+  const address = mockConnected ? "0xdemo_user_addr" : null
 
   return (
     <div className="flex h-screen bg-background">
@@ -129,16 +129,9 @@ export default function MyAgentsPage() {
                           <button
                             onClick={async (e) => {
                               e.stopPropagation()
-                              if (!account) {
-                                try {
-                                  await connect()
-                                } catch (err) {
-                                  console.error(err)
-                                }
-                              }
-
+                              // Use mock connector to sign an attestation
                               if (!account && !address) {
-                                alert("Connect wallet first to sign")
+                                alert("Connect mock wallet (top-right) before signing")
                                 return
                               }
 
@@ -149,7 +142,7 @@ export default function MyAgentsPage() {
                                 const existing = JSON.parse(localStorage.getItem(key) || "{}")
                                 existing[agent.id] = { signature: sig, ts: Date.now() }
                                 localStorage.setItem(key, JSON.stringify(existing))
-                                alert("Signed agent attestation and saved locally")
+                                alert("Signed agent attestation (mock) and saved locally")
                               } catch (err) {
                                 console.error(err)
                                 alert("Signing failed: " + String(err))

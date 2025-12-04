@@ -4,12 +4,13 @@ import * as React from "react"
 import { useState } from "react"
 import { explorerLink } from "@/lib/starknet-client"
 import WalletConnector from "@/components/wallet-connector"
-import { useAccount } from "@starknet-react/core"
 import { signMessageNormalized } from "@/lib/starknet-sign"
 
 export default function TestSandboxPage({ params }: { params: { id: string } }) {
   const { id } = React.use(params)
-  const { account, address } = useAccount() as any
+  const mockConnected = typeof window !== "undefined" && !!localStorage.getItem("phantom.mock.connected")
+  const account = mockConnected ? "demo_user_account" : null
+  const address = mockConnected ? "0xdemo_user_addr" : null
   const [prompt, setPrompt] = useState("Hello, agent. Summarize market conditions.")
   const [response, setResponse] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -43,7 +44,7 @@ export default function TestSandboxPage({ params }: { params: { id: string } }) 
     if (!proof) return
     setSubmitting(true)
     try {
-      // Optionally request a signature over the proof before submitting
+      // Optionally request a mock signature over the proof before submitting
       let signature = null
       if (account) {
         try {

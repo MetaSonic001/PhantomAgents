@@ -4,11 +4,10 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useAccount, useConnect, useDisconnect, useNetwork } from "@starknet-react/core"
+import { agentApi } from "@/lib/api-client"
 import { Sidebar } from "@/components/sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
 import WalletConnector from "@/components/wallet-connector"
-import { explorerLink } from "@/lib/starknet-client"
 import { CheckCircle2, Circle, ChevronRight, Eye, Code2, Play } from "lucide-react"
 import { AgentIdentity } from "@/components/builder/agent-identity"
 import { CapabilitiesPanel } from "@/components/builder/capabilities-panel"
@@ -16,7 +15,6 @@ import { DataSourcesPanel } from "@/components/builder/data-sources-panel"
 import { IntegrationsPanel } from "@/components/builder/integrations-panel"
 import { RulesPanel } from "@/components/builder/rules-panel"
 import { PreviewPanel } from "@/components/builder/preview-panel"
-import { signMessageNormalized } from "@/lib/starknet-sign"
 import RAGSources from "@/components/builder/rag-sources"
 import AgentPolicies from "@/components/builder/agent-policies"
 import Scheduler from "@/components/builder/scheduler"
@@ -77,11 +75,6 @@ const BUILDER_SECTIONS = [
 
 export default function BuilderPage() {
   const router = useRouter()
-  const { account, address, status } = useAccount() as any
-  const { connect, connectors } = useConnect() as any
-  const { disconnect } = useDisconnect() as any
-  const { chain } = useNetwork() as any
-
   const [registering, setRegistering] = useState(false)
   const [registeredInfo, setRegisteredInfo] = useState<any | null>(null)
   const [activeSection, setActiveSection] = useState("identity")
@@ -148,9 +141,9 @@ export default function BuilderPage() {
   }
 
   return (
-    <div className="flex h-screen bg-background" onKeyDown={handleKeyDown}>
+    <div className="flex h-screen bg-background">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden ml-64">
+      <div className="flex-1 flex flex-col overflow-hidden ml-64" onKeyDown={handleKeyDown}>
         <DashboardHeader />
         <div className="flex-1 overflow-hidden flex">
           <div className="w-72 border-r border-border bg-slate-50 dark:bg-slate-900/50 overflow-y-auto">
@@ -220,30 +213,30 @@ export default function BuilderPage() {
 
             <div className="border-t border-border p-4 mt-4 space-y-2 bg-slate-50/50 dark:bg-slate-900/30">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Shortcuts</p>
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Command Palette</span>
-                  <kbd className="px-2 py-0.5 bg-muted text-muted-foreground rounded text-[10px] font-mono border border-border">
-                    ⌘K
-                  </kbd>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Next Section</span>
-                  <kbd className="px-2 py-0.5 bg-muted text-muted-foreground rounded text-[10px] font-mono border border-border">
-                    ⌘→
-                  </kbd>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Previous Section</span>
-                  <kbd className="px-2 py-0.5 bg-muted text-muted-foreground rounded text-[10px] font-mono border border-border">
-                    ⌘←
-                  </kbd>
-                </div>
-              </div>
-            </div>
-          </div>
+                          <div className="mt-4">
+                            <div className="flex items-center gap-3 text-xs">
+                              <div className="px-2 py-1 rounded bg-muted/30 text-muted-foreground">Mode:</div>
+                              <div className="font-mono text-sm">Mock Backend</div>
+                              <div className="ml-3 text-xs text-muted-foreground">{registeredInfo ? `Registered: ${String(registeredInfo.agent_id ?? registeredInfo.contractAddress ?? registeredInfo.tokenId)}` : "Not registered"}</div>
+                            </div>
 
-          <div className="flex-1 overflow-y-auto">
+                            {registeredInfo && (
+                              <div className="mt-3 p-3 rounded bg-primary/5 border border-primary/10 text-sm">
+                                <div className="font-medium">Agent registered (mock)</div>
+                                <div className="mt-1 font-mono text-xs">ID: {registeredInfo.agent_id || registeredInfo.contractAddress || registeredInfo.tokenId}</div>
+                                {registeredInfo.explorer_url && (
+                                  <div className="mt-2">
+                                    <a href={registeredInfo.explorer_url} target="_blank" rel="noreferrer" className="text-primary">
+                                      View on explorer
+                                    </a>
+                                    <a href={`/dashboard/marketplace/${registeredInfo.contract_address ?? registeredInfo.contractAddress}`} className="ml-4 text-sm">
+                                      View listing
+                                    </a>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
             <div className="flex h-full">
               {/* Main Panel */}
               <div className="flex-1 p-8 overflow-y-auto">
@@ -252,7 +245,10 @@ export default function BuilderPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-3xl">{BUILDER_SECTIONS[currentSectionIndex].icon}</span>
+            </div>
+          </div>
+
+          <div className="flex h-full">
                         <h2 className="text-3xl font-bold text-foreground">
                           {BUILDER_SECTIONS[currentSectionIndex].label}
                         </h2>
@@ -263,21 +259,21 @@ export default function BuilderPage() {
                       {/* Network & registration banner */}
                         <div className="mt-4">
                           <div className="flex items-center gap-3 text-xs">
-                            <div className="px-2 py-1 rounded bg-muted/30 text-muted-foreground">Network:</div>
-                            <div className="font-mono text-sm">{String(status ?? chain?.name ?? chain?.id ?? "unknown")}</div>
-                            <div className="ml-3 text-xs text-muted-foreground">{address || account ? `Connected: ${String(address ?? account?.address ?? account).slice(0, 14)}` : "Not connected"}</div>
+                            <div className="px-2 py-1 rounded bg-muted/30 text-muted-foreground">Mode:</div>
+                            <div className="font-mono text-sm">Mock Backend</div>
+                            <div className="ml-3 text-xs text-muted-foreground">{registeredInfo ? `Registered: ${String(registeredInfo.agent_id ?? registeredInfo.contractAddress ?? registeredInfo.tokenId)}` : "Not registered"}</div>
                           </div>
 
                           {registeredInfo && (
                             <div className="mt-3 p-3 rounded bg-primary/5 border border-primary/10 text-sm">
-                              <div className="font-medium">Agent registered on-chain</div>
-                              <div className="mt-1 font-mono text-xs">Address: {registeredInfo.contractAddress || registeredInfo.tokenId}</div>
-                              {registeredInfo.contractAddress && (
+                              <div className="font-medium">Agent registered (mock)</div>
+                              <div className="mt-1 font-mono text-xs">ID: {registeredInfo.agent_id || registeredInfo.contractAddress || registeredInfo.tokenId}</div>
+                              {registeredInfo.explorer_url && (
                                 <div className="mt-2">
-                                  <a href={explorerLink(registeredInfo.contractAddress)} target="_blank" rel="noreferrer" className="text-primary">
+                                  <a href={registeredInfo.explorer_url} target="_blank" rel="noreferrer" className="text-primary">
                                     View on explorer
                                   </a>
-                                  <a href={`/dashboard/marketplace/${registeredInfo.contractAddress}`} className="ml-4 text-sm">
+                                  <a href={`/dashboard/marketplace/${registeredInfo.contract_address ?? registeredInfo.contractAddress}`} className="ml-4 text-sm">
                                     View listing
                                   </a>
                                 </div>
@@ -306,50 +302,35 @@ export default function BuilderPage() {
                         <div className="ml-3">
                           <button
                             onClick={async () => {
-                              // Register Agent flow
-                              if (!account) {
-                                try {
-                                  if (connect) await connect()
-                                } catch (e) {
-                                  console.error("connect failed", e)
-                                }
-                              }
-
-                              if (!account && !address) {
-                                alert("Please connect your StarkNet wallet before registering the agent.")
-                                return
-                              }
-
+                              // Register Agent (mock backend flow)
                               setRegistering(true)
                               setRegisteredInfo(null)
                               try {
-                                const payload: any = { agentData }
-                                // Try to sign a registration message if the account exposes signMessage
-                                if ((account && typeof account.signMessage === "function") || (account && typeof account.request === "function")) {
-                                  const msg = JSON.stringify({ action: "register-agent", agent: agentData, ts: Date.now() })
-                                  try {
-                                    const sig = await signMessageNormalized(account ?? address, msg)
-                                    // include signer and signature
-                                    payload["signer"] = address ?? account?.address ?? account
-                                    payload["signature"] = sig
-                                  } catch (e) {
-                                    console.warn("sign failed", e)
-                                  }
-                                }
-
-                                const res = await fetch("/api/starknet/register-agent", {
-                                  method: "POST",
-                                  headers: { "Content-Type": "application/json" },
-                                  body: JSON.stringify(payload),
+                                // Create agent
+                                const createRes: any = await agentApi.create({
+                                  name: agentData.name,
+                                  description: agentData.description,
+                                  personality: agentData.personality,
+                                  capabilities: [],
+                                  data_sources: [],
+                                  rules: {},
+                                  visibility: agentData.visibility,
+                                  pricing: null,
                                 })
-                                const j = await res.json()
-                                setRegisteredInfo(j)
+
+                                const agentId = createRes.agent_id
+
+                                // Register on mock chain via backend
+                                const regRes: any = await agentApi.register(agentId)
+                                // regRes contains tx_hash, explorer_url, etc.
+                                const combined = { ...regRes, agent_id: agentId }
+                                setRegisteredInfo(combined)
 
                                 // Persist as a local listing placeholder
                                 try {
                                   const key = "phantom.seller.listings"
                                   const existing = JSON.parse(localStorage.getItem(key) || "[]")
-                                  existing.push({ id: j.contractAddress || j.tokenId || `local-${Date.now()}`, agentData, onChain: j })
+                                  existing.push({ id: combined.contractAddress || combined.agent_id || `local-${Date.now()}`, agentData, onChain: combined })
                                   localStorage.setItem(key, JSON.stringify(existing))
                                 } catch (e) {
                                   console.warn("local persist failed", e)

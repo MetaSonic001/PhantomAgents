@@ -200,6 +200,10 @@ Environment variables (examples):
 - `DATABASE_URL` — Postgres connection (if you wire a DB)
 - `KMS_KEY_ID` or provider-specific KMS config (for production secrets)
 
+Quick env setup:
+- Copy `.env.local.example` to `.env.local` and adjust `NEXT_PUBLIC_BACKEND_URL` to point at your running backend (default: `http://localhost:8000`).
+      The backend also includes a `backend/.env` file for mock/demo settings (e.g. `MOCK_BLOCKCHAIN=true`).
+
 Local testing tips:
 - Many demo pages use localStorage (keys, reviews, seller listings). Clearing localStorage will reset demo data.
 - To test blockchain flows locally, use Hardhat or Anvil and connect MetaMask to the local network; configure contract addresses via env vars.

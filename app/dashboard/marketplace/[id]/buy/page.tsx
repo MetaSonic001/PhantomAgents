@@ -5,7 +5,6 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import WalletConnector from "@/components/wallet-connector"
 import { explorerLink } from "@/lib/starknet-client"
-import { useAccount } from "@starknet-react/core"
 import { signMessageNormalized } from "@/lib/starknet-sign"
 
 export default function BuyPage({ params }: { params: { id: string } }) {
@@ -15,9 +14,11 @@ export default function BuyPage({ params }: { params: { id: string } }) {
   const [success, setSuccess] = useState(false)
   const [txHash, setTxHash] = useState<string | null>(null)
 
-  // Buyer address will be read from connected wallet in a real flow; here we accept an optional override
+  // Buyer address will be read from mock connector or optional override
   const [buyerAddress, setBuyerAddress] = useState<string | undefined>(undefined)
-  const { account, address } = useAccount() as any
+  const mockConnected = typeof window !== "undefined" && !!localStorage.getItem("phantom.mock.connected")
+  const account = mockConnected ? "demo_user_account" : null
+  const address = mockConnected ? "0xdemo_user_addr" : null
 
   const handleBuy = async () => {
     setProcessing(true)
@@ -25,7 +26,7 @@ export default function BuyPage({ params }: { params: { id: string } }) {
       // Auto-fill buyer address from connected wallet if available
       const buyer = buyerAddress || account?.address || account
 
-      // Try to sign a purchase intent if possible
+      // Try to sign a purchase intent (mock)
       let signature = null
       if (account) {
         try {
