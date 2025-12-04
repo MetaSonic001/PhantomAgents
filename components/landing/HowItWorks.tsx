@@ -141,10 +141,10 @@ export const HowItWorks = () => {
                         How It Works
                     </span>
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                        <span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-violet-700 via-indigo-600 to-violet-600 bg-clip-text text-transparent drop-shadow-[0_1px_0_rgba(0,0,0,0.25)]">
                             From Idea to{" "}
                         </span>
-                        <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_1px_0_rgba(0,0,0,0.25)]">
                             Verified Agent
                         </span>
                     </h2>

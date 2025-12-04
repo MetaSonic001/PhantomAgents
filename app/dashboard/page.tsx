@@ -1,40 +1,10 @@
 "use client"
 
 import { MoreVertical, ArrowUpRight, Play, ShoppingCart } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-
-// Mock data for agents
-const mockAgents = [
-  {
-    id: "1",
-    name: "Crypto Trader Pro",
-    status: "active",
-    lastAction: "2 mins ago",
-    actionsToday: 24,
-    revenue: 1240.5,
-    type: "Trading Agent",
-  },
-  {
-    id: "2",
-    name: "Market Oracle",
-    status: "active",
-    lastAction: "5 mins ago",
-    actionsToday: 18,
-    revenue: 890.25,
-    type: "Prediction Oracle",
-  },
-  {
-    id: "3",
-    name: "DAO Delegate",
-    status: "idle",
-    lastAction: "1 hour ago",
-    actionsToday: 0,
-    revenue: 450.0,
-    type: "Governance Delegate",
-  },
-]
+import { agentApi } from "@/lib/api-client"
 
 const mockActivities = [
   { agent: "Crypto Trader Pro", action: "Trade Executed", type: "success", time: "2 mins ago" },
@@ -44,12 +14,50 @@ const mockActivities = [
 ]
 
 export default function DashboardPage() {
-  const [agents, setAgents] = useState(mockAgents)
+  const [agents, setAgents] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadAgents() {
+      try {
+        const response = await agentApi.getAll()
+        const agentsList = response.agents || []
+        // Map backend agents to dashboard format
+        const mapped = agentsList.map((agent: any) => ({
+          id: agent.id,
+          name: agent.name,
+          status: agent.status === "registered" ? "active" : "idle",
+          lastAction: "2 mins ago", // TODO: compute from actual actions
+          actionsToday: agent.action_count || 0,
+          revenue: agent.revenue || 0,
+          type: agent.description || "AI Agent",
+        }))
+        setAgents(mapped)
+      } catch (error) {
+        console.error("Failed to load agents:", error)
+        // Keep empty array on error
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadAgents()
+  }, [])
 
   const totalAgents = agents.length
   const activeAgents = agents.filter((a) => a.status === "active").length
   const totalRevenue = agents.reduce((sum, a) => sum + a.revenue, 0)
   const totalActions = agents.reduce((sum, a) => sum + a.actionsToday, 0)
+
+  if (loading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading dashboard...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="p-8 space-y-8">

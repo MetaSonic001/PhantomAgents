@@ -14,6 +14,13 @@ from cryptography.fernet import Fernet
 
 app = FastAPI(title="PhantomAgents Backend API")
 
+@app.on_event("startup")
+async def startup_event():
+    """Initialize mock data on startup"""
+    initialize_mock_data()
+    print("✅ Mock data initialized")
+    print(f"📊 {len(agents_db)} agents, {len(listings_db)} listings, {len(actions_db)} actions")
+
 # ==========================================
 # CONFIGURATION
 # ==========================================
@@ -420,6 +427,152 @@ async def submit_to_starknet_mock(contract_address: str, function: str, calldata
                 pass
 
             await asyncio.sleep(5)
+
+# ==========================================
+# MOCK DATA INITIALIZATION
+# ==========================================
+def initialize_mock_data():
+    """Pre-populate demo agents and marketplace for showcase"""
+    demo_user = "demo_user"
+    
+    # Pre-configured demo agents
+    demo_agents = [
+        {
+            "id": "agent_crypto_trader",
+            "name": "Crypto Trader Pro",
+            "description": "Advanced trading agent that analyzes market signals and executes trades with ZK-verified strategies",
+            "personality": "Analytical, data-driven, risk-aware professional trader",
+            "capabilities": ["Predict", "Signal", "Transaction"],
+            "data_sources": ["CoinGecko", "DeFiLlama", "Twitter Sentiment"],
+            "rules": {"max_trade_size": 1000, "stop_loss": 0.05},
+            "visibility": "public",
+            "pricing": {"model": "subscription", "price_usd": 99},
+            "creator": demo_user,
+            "metadata_hash": compute_hash("crypto_trader_config"),
+            "created_at": "2024-11-15T10:00:00",
+            "status": "registered",
+            "action_count": 247,
+            "proof_count": 247,
+            "tx_hash": "0x1a2b3c4d5e6f",
+            "on_chain_id": "agent_crypto_trader",
+            "performance": "+22.5%",
+            "subscribers": 24,
+            "revenue": 2376.0
+        },
+        {
+            "id": "agent_market_oracle",
+            "name": "Market Analysis Bot",
+            "description": "Research assistant that provides verified market insights and trend analysis",
+            "personality": "Thorough, academic, objective researcher",
+            "capabilities": ["Predict", "Publish"],
+            "data_sources": ["Research Papers", "Market Data APIs"],
+            "rules": {"confidence_threshold": 0.7},
+            "visibility": "private",
+            "pricing": None,
+            "creator": demo_user,
+            "metadata_hash": compute_hash("market_oracle_config"),
+            "created_at": "2024-11-10T14:30:00",
+            "status": "draft",
+            "action_count": 0,
+            "proof_count": 0,
+            "performance": "-",
+            "subscribers": 0,
+            "revenue": 0
+        },
+        {
+            "id": "agent_governance",
+            "name": "Governance Voter",
+            "description": "Autonomous DAO delegate that votes on proposals based on configured principles",
+            "personality": "Democratic, principled, community-focused delegate",
+            "capabilities": ["Vote", "Signal"],
+            "data_sources": ["Snapshot", "DAO Forums"],
+            "rules": {"voting_strategy": "weighted"},
+            "visibility": "public",
+            "pricing": {"model": "subscription", "price_usd": 49},
+            "creator": demo_user,
+            "metadata_hash": compute_hash("governance_config"),
+            "created_at": "2024-11-12T09:15:00",
+            "status": "registered",
+            "action_count": 89,
+            "proof_count": 89,
+            "tx_hash": "0x7f8e9d0c1b2a",
+            "on_chain_id": "agent_governance",
+            "performance": "+15.2%",
+            "subscribers": 12,
+            "revenue": 588.0
+        }
+    ]
+    
+    for agent in demo_agents:
+        agents_db[agent["id"]] = agent
+    
+    # Pre-configured actions for demo agents
+    demo_actions = [
+        {
+            "id": "action_001",
+            "agent_id": "agent_crypto_trader",
+            "type": "signal",
+            "input": "Analyze BTC price movement",
+            "output": "BUY signal with 85% confidence",
+            "timestamp": "2024-12-04T21:15:00",
+            "proof_id": "proof_001",
+            "tx_hash": "0xabc123",
+            "status": "verified"
+        },
+        {
+            "id": "action_002",
+            "agent_id": "agent_governance",
+            "type": "vote",
+            "input": "Proposal #45: Increase treasury allocation",
+            "output": "Voted YES with rationale",
+            "timestamp": "2024-12-04T20:45:00",
+            "proof_id": "proof_002",
+            "tx_hash": "0xdef456",
+            "status": "verified"
+        }
+    ]
+    
+    for action in demo_actions:
+        actions_db[action["id"]] = action
+    
+    # Pre-configured marketplace listings
+    demo_listings = [
+        {
+            "id": "agent_crypto_trader",
+            "agent_id": "agent_crypto_trader",
+            "name": "Crypto Trader Pro",
+            "description": "Advanced trading agent that analyzes market signals and executes trades with ZK-verified strategies",
+            "creator": demo_user,
+            "price": 99,
+            "pricing_model": "subscription",
+            "rating": 4.8,
+            "reviews_count": 24,
+            "subscribers": 24,
+            "capabilities": ["Predict", "Signal", "Transaction"],
+            "performance": "+22.5%",
+            "status": "active",
+            "created_at": "2024-11-15T10:00:00"
+        },
+        {
+            "id": "agent_governance",
+            "agent_id": "agent_governance",
+            "name": "Governance Voter",
+            "description": "Autonomous DAO delegate that votes on proposals based on configured principles",
+            "creator": demo_user,
+            "price": 49,
+            "pricing_model": "subscription",
+            "rating": 4.6,
+            "reviews_count": 12,
+            "subscribers": 12,
+            "capabilities": ["Vote", "Signal"],
+            "performance": "+15.2%",
+            "status": "active",
+            "created_at": "2024-11-12T09:15:00"
+        }
+    ]
+    
+    for listing in demo_listings:
+        listings_db[listing["id"]] = listing
 
 # ==========================================
 # AUTH HELPER

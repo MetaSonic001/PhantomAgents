@@ -1,81 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Search, Star, TrendingUp } from "lucide-react"
 import { motion } from "framer-motion"
-
-// Mock marketplace agents
-const mockAgents = [
-  {
-    id: "1",
-    name: "Crypto Trader Pro",
-    creator: "TradeFi Labs",
-    type: "Trading Agent",
-    description: "Execute trades with real-time market analysis",
-    rating: 4.8,
-    reviews: 142,
-    price: 99,
-    trending: true,
-    capabilities: ["Trading Signals", "Market Analysis", "Risk Management"],
-  },
-  {
-    id: "2",
-    name: "Market Oracle",
-    creator: "Prediction.AI",
-    type: "Prediction Oracle",
-    description: "Real-time price and event predictions",
-    rating: 4.6,
-    reviews: 98,
-    price: 79,
-    capabilities: ["Price Forecasting", "Event Prediction", "Accuracy 92%"],
-  },
-  {
-    id: "3",
-    name: "DAO Delegate",
-    creator: "Governance Labs",
-    type: "Governance Delegate",
-    description: "Participate in DAO governance automatically",
-    rating: 4.9,
-    reviews: 215,
-    price: 49,
-    trending: true,
-    capabilities: ["Voting", "Proposal Analysis", "Vote Delegation"],
-  },
-  {
-    id: "4",
-    name: "Research Assistant",
-    creator: "ResearchHub",
-    type: "Research Assistant",
-    description: "Generate comprehensive research reports",
-    rating: 4.7,
-    reviews: 156,
-    price: 69,
-    capabilities: ["Data Analysis", "Report Generation", "Citations"],
-  },
-  {
-    id: "5",
-    name: "Social Manager",
-    creator: "SocialIO",
-    type: "Social Agent",
-    description: "Manage social media across platforms",
-    rating: 4.5,
-    reviews: 87,
-    price: 59,
-    capabilities: ["Multi-platform", "Scheduling", "Analytics"],
-  },
-  {
-    id: "6",
-    name: "Task Automator",
-    creator: "WorkflowAI",
-    type: "Task Manager",
-    description: "Automate complex workflows and tasks",
-    rating: 4.4,
-    reviews: 72,
-    price: 39,
-    capabilities: ["Workflow Building", "Task Scheduling", "Logging"],
-  },
-]
+import { marketplaceApi } from "@/lib/api-client"
 
 const CATEGORIES = ["All", "Trading", "Research", "Governance", "Productivity", "Social"]
 
@@ -86,8 +15,48 @@ export default function MarketplacePage() {
   const [sortBy, setSortBy] = useState("popular")
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState(MARKETPLACE_TABS[0])
+  const [agents, setAgents] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const filteredAgents = mockAgents.filter((agent) => {
+  useEffect(() => {
+    async function loadMarketplace() {
+      try {
+        const response = await marketplaceApi.getAll()
+        const listings = response.agents || []
+        // Map to UI format
+        const mapped = listings.map((listing: any) => ({
+          id: listing.id || listing.agent_id,
+          name: listing.name,
+          creator: listing.creator || "Demo Creator",
+          type: listing.capabilities?.[0] || "AI Agent",
+          description: listing.description,
+          rating: listing.rating || 4.5,
+          reviews: listing.reviews_count || 0,
+          price: listing.price || 0,
+          trending: listing.subscribers > 10,
+          capabilities: listing.capabilities || [],
+        }))
+        setAgents(mapped)
+      } catch (error) {
+        console.error("Failed to load marketplace:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadMarketplace()
+  }, [])
+
+  const handleSubscribe = async (agentId: string) => {
+    try {
+      const response = await marketplaceApi.subscribe(agentId)
+      alert(`Successfully subscribed to agent! Subscription ID: ${response.subscription_id}`)
+    } catch (error) {
+      console.error("Failed to subscribe:", error)
+      alert("Failed to subscribe to agent")
+    }
+  }
+
+  const filteredAgents = agents.filter((agent) => {
     const matchesSearch =
       agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       agent.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -111,6 +80,15 @@ export default function MarketplacePage() {
         <p className="text-gray-400">Discover and rent production-ready AI agents — listings, NFTs, and buying tools</p>
       </motion.div>
 
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading marketplace...</p>
+          </div>
+        </div>
+      ) : (
+        <>
       {/* Tabs for Listings / NFTs */}
       <div className="flex gap-2">
         {MARKETPLACE_TABS.map((tab) => (
@@ -230,6 +208,7 @@ export default function MarketplacePage() {
                     <button
                       onClick={(e) => {
                         e.preventDefault()
+                        handleSubscribe(agent.id)
                       }}
                       className="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 transition text-sm font-medium"
                     >
@@ -396,6 +375,8 @@ export default function MarketplacePage() {
             </div>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   )

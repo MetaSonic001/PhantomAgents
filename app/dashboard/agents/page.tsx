@@ -1,58 +1,96 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Plus, Grid2x2, List, MoreVertical, Play, Pause, Trash2, Share2, Eye } from "lucide-react"
 import { signMessageNormalized } from "@/lib/starknet-sign"
 import Animated from "@/components/Animated"
 import AmbientBackground from "@/components/ambient"
 import { motion } from "framer-motion"
-
-const mockUserAgents = [
-  {
-    id: "1",
-    name: "Crypto Trader Pro",
-    type: "Trading Agent",
-    status: "active",
-    created: "2 weeks ago",
-    lastModified: "3 days ago",
-    performance: "+22.5%",
-    subscribers: 24,
-    revenue: 2376.0,
-    private: false,
-  },
-  {
-    id: "2",
-    name: "Market Analysis Bot",
-    type: "Research Assistant",
-    status: "inactive",
-    created: "1 month ago",
-    lastModified: "1 week ago",
-    performance: "-",
-    subscribers: 0,
-    revenue: 0,
-    private: true,
-  },
-  {
-    id: "3",
-    name: "Governance Voter",
-    type: "Governance Delegate",
-    status: "active",
-    created: "3 weeks ago",
-    lastModified: "2 days ago",
-    performance: "+15.2%",
-    subscribers: 12,
-    revenue: 588.0,
-    private: false,
-  },
-]
+import { agentApi } from "@/lib/api-client"
 
 export default function MyAgentsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null)
+  const [agents, setAgents] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const mockConnected = typeof window !== "undefined" && !!localStorage.getItem("phantom.mock.connected")
   const account = mockConnected ? "demo_user_account" : null
   const address = mockConnected ? "0xdemo_user_addr" : null
+
+  useEffect(() => {
+    async function loadAgents() {
+      try {
+        const response = await agentApi.getAll()
+        const agentsList = response.agents || []
+        // Map to UI format
+        const mapped = agentsList.map((agent: any) => ({
+          id: agent.id,
+          name: agent.name,
+          type: agent.description || "AI Agent",
+          status: agent.status === "registered" ? "active" : "inactive",
+          created: new Date(agent.created_at).toLocaleDateString(),
+          lastModified: new Date(agent.created_at).toLocaleDateString(),
+          performance: agent.performance || "-",
+          subscribers: agent.subscribers || 0,
+          revenue: agent.revenue || 0,
+          private: agent.visibility === "private",
+        }))
+        setAgents(mapped)
+      } catch (error) {
+        console.error("Failed to load agents:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadAgents()
+  }, [])
+
+  const handleRunAgent = async (agentId: string) => {
+    try {
+      const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
+      const response = await fetch(`${BASE_URL}/agents/${agentId}/run`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: "Run agent task",
+          trigger: "manual",
+          provider: "groqcloud",
+        }),
+      })
+      if (response.ok) {
+        alert("Agent executed successfully!")
+      } else {
+        const error = await response.json()
+        alert(`Failed to run agent: ${error.detail || "Unknown error"}`)
+      }
+    } catch (error) {
+      console.error("Failed to run agent:", error)
+      alert("Failed to run agent. Make sure your API keys are configured.")
+    }
+  }
+
+  const handlePauseAgent = (agentId: string) => {
+    alert(`Pausing agent ${agentId}`)
+  }
+
+  const handleDeleteAgent = async (agentId: string) => {
+    if (!confirm("Are you sure you want to delete this agent?")) return
+    try {
+      await agentApi.delete(agentId)
+      setAgents(agents.filter((a) => a.id !== agentId))
+      alert("Agent deleted successfully!")
+    } catch (error) {
+      console.error("Failed to delete agent:", error)
+      alert("Failed to delete agent")
+    }
+  }
+
+  const handleShareAgent = (agentId: string) => {
+    const url = `${window.location.origin}/marketplace/${agentId}`
+    navigator.clipboard.writeText(url)
+    alert("Agent URL copied to clipboard!")
+  }
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -78,9 +116,18 @@ export default function MyAgentsPage() {
           </div>
         </motion.div>
 
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading agents...</p>
+            </div>
+          </div>
+        ) : (
+          <>
             {/* Controls */}
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }} className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">{mockUserAgents.length} agents</div>
+              <div className="text-sm text-muted-foreground">{agents.length} agents</div>
               <div className="flex gap-2">
                 <button
                   onClick={() => setViewMode("grid")}
@@ -100,7 +147,7 @@ export default function MyAgentsPage() {
             {/* Agents Grid View */}
             {viewMode === "grid" && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mockUserAgents.map((agent, index) => (
+                {agents.map((agent, index) => (
                   <motion.div
                     key={agent.id}
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -185,13 +232,25 @@ export default function MyAgentsPage() {
 
                     {/* Actions */}
                     <div className="px-6 py-4 border-t border-border flex gap-2">
-                      <button className="flex-1 py-2 px-3 rounded-md border border-border hover:bg-secondary transition text-sm font-medium flex items-center justify-center gap-2">
-                        <Eye className="w-4 h-4" />
-                        View
+                      <Link href={`/dashboard/agents/${agent.id}`} className="flex-1">
+                        <button className="w-full py-2 px-3 rounded-md border border-border hover:bg-secondary transition text-sm font-medium flex items-center justify-center gap-2">
+                          <Eye className="w-4 h-4" />
+                          View
+                        </button>
+                      </Link>
+                      <button 
+                        onClick={() => handleRunAgent(agent.id)}
+                        className="flex-1 py-2 px-3 rounded-md border border-border hover:bg-secondary transition text-sm font-medium flex items-center justify-center gap-2"
+                      >
+                        <Play className="w-4 h-4" />
+                        Run
                       </button>
-                      <button className="flex-1 py-2 px-3 rounded-md border border-border hover:bg-secondary transition text-sm font-medium flex items-center justify-center gap-2">
+                      <button 
+                        onClick={() => handleShareAgent(agent.id)}
+                        className="flex-1 py-2 px-3 rounded-md border border-border hover:bg-secondary transition text-sm font-medium flex items-center justify-center gap-2"
+                      >
                         <Share2 className="w-4 h-4" />
-                        Deploy
+                        Share
                       </button>
                     </div>
                   </motion.div>
@@ -215,7 +274,7 @@ export default function MyAgentsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {mockUserAgents.map((agent, index) => (
+                    {agents.map((agent, index) => (
                       <motion.tr
                         key={agent.id}
                         initial={{ opacity: 0, x: -8 }}
@@ -246,13 +305,21 @@ export default function MyAgentsPage() {
                         <td className="py-4 px-6 text-sm font-medium text-foreground">${agent.revenue.toFixed(2)}</td>
                         <td className="py-4 px-6">
                           <div className="flex gap-2">
-                            <button className="p-1.5 hover:bg-secondary rounded-md transition text-muted-foreground hover:text-foreground">
-                              <Eye className="w-4 h-4" />
-                            </button>
-                            <button className="p-1.5 hover:bg-secondary rounded-md transition text-muted-foreground hover:text-foreground">
+                            <Link href={`/dashboard/agents/${agent.id}`}>
+                              <button className="p-1.5 hover:bg-secondary rounded-md transition text-muted-foreground hover:text-foreground">
+                                <Eye className="w-4 h-4" />
+                              </button>
+                            </Link>
+                            <button 
+                              onClick={() => agent.status === "active" ? handlePauseAgent(agent.id) : handleRunAgent(agent.id)}
+                              className="p-1.5 hover:bg-secondary rounded-md transition text-muted-foreground hover:text-foreground"
+                            >
                               {agent.status === "active" ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                             </button>
-                            <button className="p-1.5 hover:bg-secondary rounded-md transition text-red-600 hover:text-red-500">
+                            <button 
+                              onClick={() => handleDeleteAgent(agent.id)}
+                              className="p-1.5 hover:bg-secondary rounded-md transition text-red-600 hover:text-red-500"
+                            >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
@@ -263,6 +330,8 @@ export default function MyAgentsPage() {
                 </table>
               </motion.div>
             )}
+          </>
+        )}
       </Animated>
     </div>
   )

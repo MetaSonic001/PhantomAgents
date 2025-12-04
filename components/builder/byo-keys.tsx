@@ -23,11 +23,33 @@ export default function BYOKeys({ agentName }: { agentName?: string }) {
     } catch (e) {}
   }, [key])
 
-  const save = () => {
-    const obj = { provider, apiKey, model }
-    localStorage.setItem(key, JSON.stringify(obj))
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+  const save = async () => {
+    // Save to backend for encryption
+    try {
+      const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
+      const response = await fetch(`${BASE_URL}/api/keys/store`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          provider,
+          api_key: apiKey,
+        }),
+      })
+      
+      if (response.ok) {
+        // Also save model preference locally
+        const obj = { provider, model }
+        localStorage.setItem(key, JSON.stringify(obj))
+        setSaved(true)
+        setTimeout(() => setSaved(false), 2000)
+      } else {
+        const error = await response.json()
+        alert(`Failed to save key: ${error.detail || "Unknown error"}`)
+      }
+    } catch (error) {
+      console.error("Failed to save key:", error)
+      alert("Failed to save API key to backend")
+    }
   }
 
   return (
