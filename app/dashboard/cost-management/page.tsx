@@ -1,5 +1,62 @@
 "use client"
 
+import { Sidebar } from "@/components/sidebar"
+import { DashboardHeader } from "@/components/dashboard-header"
+import { Download } from "lucide-react"
+
+const MOCK = [
+  { agent: "Crypto Trader Pro", cost: 156.5, actions: 4250 },
+  { agent: "Market Oracle", cost: 89.2, actions: 3180 },
+  { agent: "DAO Delegate", cost: 234.8, actions: 5026 },
+]
+
+export default function CostManagement() {
+  const exportCsv = () => {
+    const rows = [["Agent","Cost","Actions"], ...MOCK.map((r) => [r.agent, `$${r.cost.toFixed(2)}`, String(r.actions)])]
+    const csv = rows.map((r) => r.join(",")).join("\n")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "costs.csv"
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  return (
+    <div className="flex h-screen bg-background">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden ml-64">
+        <DashboardHeader />
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-2xl font-bold">Cost Management</h1>
+                <p className="text-muted-foreground">Per-agent cost breakdown and export</p>
+              </div>
+              <button onClick={exportCsv} className="flex items-center gap-2 px-3 py-2 bg-primary text-primary-foreground rounded">
+                <Download className="w-4 h-4" /> Export CSV
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              {MOCK.map((m) => (
+                <div key={m.agent} className="border border-border rounded-lg p-4 bg-card">
+                  <h3 className="font-semibold mb-2">{m.agent}</h3>
+                  <p className="text-sm text-muted-foreground">Cost: <span className="font-medium">${m.cost.toFixed(2)}</span></p>
+                  <p className="text-sm text-muted-foreground">Actions: <span className="font-medium">{m.actions.toLocaleString()}</span></p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  )
+}
+"use client"
+
 import { useState } from "react"
 import { AlertTriangle, Zap } from "lucide-react"
 

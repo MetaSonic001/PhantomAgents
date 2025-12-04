@@ -1,9 +1,10 @@
 "use client"
 
+import * as React from "react"
 import { useState } from "react"
 
 export default function TestSandboxPage({ params }: { params: { id: string } }) {
-  const { id } = params
+  const { id } = React.use(params)
   const [prompt, setPrompt] = useState("Hello, agent. Summarize market conditions.")
   const [response, setResponse] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)

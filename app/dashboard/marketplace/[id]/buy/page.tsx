@@ -1,11 +1,12 @@
 "use client"
 
+import * as React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 
 export default function BuyPage({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const { id } = params
+  const { id } = React.use(params)
   const [processing, setProcessing] = useState(false)
   const [success, setSuccess] = useState(false)
 
