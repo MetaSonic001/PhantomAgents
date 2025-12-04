@@ -2,10 +2,16 @@
 
 import { Search, Bell, Settings } from "lucide-react"
 import ThemeToggle from "./theme-toggle"
+import { motion } from "framer-motion"
 
 export function DashboardHeader() {
   return (
-    <div className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
+    <motion.div
+      initial={{ y: -8, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+      className="border-b border-border bg-background/60 backdrop-blur supports-backdrop-filter:bg-background/40 sticky top-0 z-40"
+    >
       <div className="flex items-center justify-between px-8 h-16 gap-4">
         <div className="flex-1 max-w-md">
           <div className="relative">
@@ -27,6 +33,6 @@ export function DashboardHeader() {
           <ThemeToggle />
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

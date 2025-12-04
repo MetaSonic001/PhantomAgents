@@ -4,9 +4,9 @@ import { useState } from "react"
 import Link from "next/link"
 import { Plus, Grid2x2, List, MoreVertical, Play, Pause, Trash2, Share2, Eye } from "lucide-react"
 import { signMessageNormalized } from "@/lib/starknet-sign"
-import { Sidebar } from "@/components/sidebar"
-import { DashboardHeader } from "@/components/dashboard-header"
-import WalletConnector from "@/components/wallet-connector"
+import Animated from "@/components/Animated"
+import AmbientBackground from "@/components/ambient"
+import { motion } from "framer-motion"
 
 const mockUserAgents = [
   {
@@ -55,70 +55,70 @@ export default function MyAgentsPage() {
   const address = mockConnected ? "0xdemo_user_addr" : null
 
   return (
-    <div className="flex h-screen bg-background">
-      <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden ml-64">
-        <DashboardHeader />
-        <main className="flex-1 overflow-y-auto">
-          <div className="p-8 space-y-8">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold mb-2">My Agents</h1>
-                <p className="text-muted-foreground">Manage and monitor your created agents</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="hidden md:block">
-                  <WalletConnector />
-                </div>
-                <Link
-                  href="/builder"
-                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition font-medium"
-                >
-                  <Plus className="w-4 h-4" />
-                  New Agent
-                </Link>
-              </div>
+    <div className="relative min-h-screen bg-[#030014]">
+      <AmbientBackground />
+      <Animated className="p-8 space-y-8">
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2 text-white">My Agents</h1>
+            <p className="text-gray-400">Manage and monitor your created agents</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="hidden md:block">
+              {/* WalletConnector */}
             </div>
+            <Link
+              href="/builder"
+              className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-violet-600 to-indigo-600 text-white rounded-md hover:opacity-90 transition font-medium"
+            >
+              <Plus className="w-4 h-4" />
+              New Agent
+            </Link>
+          </div>
+        </motion.div>
 
             {/* Controls */}
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">{mockUserAgents.length} agents</div>
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }} className="flex items-center justify-between">
+              <div className="text-sm text-gray-400">{mockUserAgents.length} agents</div>
               <div className="flex gap-2">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-md transition ${viewMode === "grid" ? "bg-secondary" : "hover:bg-secondary"}`}
+                  className={`p-2 rounded-md transition ${viewMode === "grid" ? "bg-gray-800" : "hover:bg-gray-800"}`}
                 >
                   <Grid2x2 className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-md transition ${viewMode === "list" ? "bg-secondary" : "hover:bg-secondary"}`}
+                  className={`p-2 rounded-md transition ${viewMode === "list" ? "bg-gray-800" : "hover:bg-gray-800"}`}
                 >
                   <List className="w-5 h-5" />
                 </button>
               </div>
-            </div>
+            </motion.div>
 
             {/* Agents Grid View */}
             {viewMode === "grid" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mockUserAgents.map((agent) => (
-                  <div
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {mockUserAgents.map((agent, index) => (
+                  <motion.div
                     key={agent.id}
-                    className="border border-border rounded-lg overflow-hidden hover:border-accent transition group bg-card cursor-pointer"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    className="rounded-2xl overflow-hidden hover:border-violet-500/30 transition group bg-linear-to-br from-gray-900/50 to-gray-800/30 border border-gray-800 backdrop-blur-sm cursor-pointer"
                     onClick={() => setSelectedAgent(agent.id)}
                   >
                     {/* Card Header */}
-                    <div className="p-6 border-b border-border">
+                    <div className="p-6 border-b border-gray-800">
                       <div className="flex items-start justify-between mb-3">
-                        <div className="w-12 h-12 rounded-lg bg-muted"></div>
-                        <button className="p-1.5 hover:bg-secondary rounded-md opacity-0 group-hover:opacity-100 transition">
+                        <div className="w-12 h-12 rounded-lg bg-gray-700"></div>
+                        <button className="p-1.5 hover:bg-gray-800 rounded-md opacity-0 group-hover:opacity-100 transition">
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
-                      <h3 className="font-semibold text-base mb-1">{agent.name}</h3>
-                      <p className="text-xs text-muted-foreground">{agent.type}</p>
+                      <h3 className="font-semibold text-base mb-1 text-white">{agent.name}</h3>
+                      <p className="text-xs text-gray-400">{agent.type}</p>
                     </div>
 
                     {/* Stats */}
@@ -194,72 +194,76 @@ export default function MyAgentsPage() {
                         Deploy
                       </button>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             )}
 
             {/* Agents List View */}
             {viewMode === "list" && (
-              <div className="border border-border rounded-lg overflow-hidden bg-card">
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }} className="rounded-2xl overflow-hidden bg-linear-to-br from-gray-900/50 to-gray-800/30 border border-gray-800 backdrop-blur-sm">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-3 px-6 text-sm font-medium text-muted-foreground">Name</th>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-muted-foreground">Type</th>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-muted-foreground">Status</th>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-muted-foreground">Performance</th>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-muted-foreground">Subscribers</th>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-muted-foreground">Revenue</th>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-muted-foreground">Actions</th>
+                    <tr className="border-b border-gray-800">
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Name</th>
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Type</th>
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Status</th>
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Performance</th>
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Subscribers</th>
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Revenue</th>
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {mockUserAgents.map((agent) => (
-                      <tr key={agent.id} className="border-b border-border hover:bg-secondary/50 transition">
+                    {mockUserAgents.map((agent, index) => (
+                      <motion.tr
+                        key={agent.id}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                        className="border-b border-gray-800 hover:bg-gray-800/50 transition"
+                      >
                         <td className="py-4 px-6">
                           <div>
-                            <p className="text-sm font-medium">{agent.name}</p>
-                            <p className="text-xs text-muted-foreground">{agent.lastModified}</p>
+                            <p className="text-sm font-medium text-white">{agent.name}</p>
+                            <p className="text-xs text-gray-400">{agent.lastModified}</p>
                           </div>
                         </td>
-                        <td className="py-4 px-6 text-sm">{agent.type}</td>
+                        <td className="py-4 px-6 text-sm text-gray-300">{agent.type}</td>
                         <td className="py-4 px-6">
                           <span
                             className={`text-xs px-2 py-1 rounded-full font-medium inline-block ${
                               agent.status === "active"
-                                ? "bg-green-500/10 text-green-700"
-                                : "bg-yellow-500/10 text-yellow-700"
+                                ? "bg-green-500/10 text-green-400"
+                                : "bg-yellow-500/10 text-yellow-400"
                             }`}
                           >
                             {agent.status === "active" ? "● Active" : "○ Inactive"}
                           </span>
                         </td>
-                        <td className="py-4 px-6 text-sm font-medium text-primary">{agent.performance}</td>
-                        <td className="py-4 px-6 text-sm">{agent.subscribers}</td>
-                        <td className="py-4 px-6 text-sm font-medium">${agent.revenue.toFixed(2)}</td>
+                        <td className="py-4 px-6 text-sm font-medium text-violet-400">{agent.performance}</td>
+                        <td className="py-4 px-6 text-sm text-gray-300">{agent.subscribers}</td>
+                        <td className="py-4 px-6 text-sm font-medium text-white">${agent.revenue.toFixed(2)}</td>
                         <td className="py-4 px-6">
                           <div className="flex gap-2">
-                            <button className="p-1.5 hover:bg-secondary rounded-md transition">
+                            <button className="p-1.5 hover:bg-gray-800 rounded-md transition text-gray-400 hover:text-white">
                               <Eye className="w-4 h-4" />
                             </button>
-                            <button className="p-1.5 hover:bg-secondary rounded-md transition">
+                            <button className="p-1.5 hover:bg-gray-800 rounded-md transition text-gray-400 hover:text-white">
                               {agent.status === "active" ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                             </button>
-                            <button className="p-1.5 hover:bg-secondary rounded-md transition text-destructive">
+                            <button className="p-1.5 hover:bg-secondary rounded-md transition text-red-400 hover:text-red-300">
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </td>
-                      </tr>
+                      </motion.tr>
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </motion.div>
             )}
-          </div>
-        </main>
-      </div>
+      </Animated>
     </div>
   )
 }

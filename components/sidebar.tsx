@@ -27,6 +27,7 @@ import {
   TrendingUp,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { motion } from "framer-motion"
 
 const navItems = [
   { icon: LayoutGrid, label: "Dashboard", href: "/dashboard" },
@@ -66,22 +67,27 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <div className="w-64 border-r border-border bg-sidebar fixed left-0 top-0 h-screen flex flex-col overflow-hidden">
+    <motion.aside
+      initial={{ x: -12, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+      className="w-64 border-r border-gray-800 bg-gray-900 fixed left-0 top-0 h-screen flex flex-col overflow-hidden"
+    >
       {/* Logo */}
-      <div className="p-6 border-b border-sidebar-border flex-shrink-0">
+      <div className="p-6 border-b border-gray-800 shrink-0">
         <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition">
-          <div className="w-8 h-8 bg-sidebar-primary rounded-md flex items-center justify-center">
-            <span className="text-xs font-bold text-sidebar-primary-foreground">PA</span>
+          <div className="w-8 h-8 bg-linear-to-br from-violet-600 to-indigo-600 rounded-md flex items-center justify-center">
+            <span className="text-xs font-bold text-white">PA</span>
           </div>
-          <span className="font-semibold text-sidebar-foreground">PhantomAgents</span>
+          <span className="font-semibold text-white">PhantomAgents</span>
         </Link>
       </div>
 
       {/* Create New Agent Button */}
-      <div className="p-4 flex-shrink-0">
+      <div className="p-4 shrink-0">
         <Link
           href="/builder"
-          className="w-full flex items-center justify-center gap-2 bg-sidebar-primary text-sidebar-primary-foreground py-2 rounded-md hover:opacity-90 transition font-medium text-sm"
+          className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-violet-600 to-indigo-600 text-white py-2 rounded-md hover:opacity-90 transition font-medium text-sm"
         >
           <Plus className="w-4 h-4" />
           New Agent
@@ -99,8 +105,8 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium transition",
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50",
+                    ? "bg-gray-800 text-white"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-white",
                 )}
               >
                 <item.icon className="w-4 h-4" />
@@ -115,8 +121,8 @@ export function Sidebar() {
                     className={cn(
                       "text-xs px-2 py-1 rounded-md transition whitespace-nowrap",
                       pathname === "/dashboard/agents" || pathname.startsWith("/dashboard/agents/")
-                        ? "text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground/70 hover:text-sidebar-foreground",
+                        ? "text-white"
+                        : "text-gray-400 hover:text-gray-300",
                     )}
                   >
                     Overview
@@ -126,8 +132,8 @@ export function Sidebar() {
                     className={cn(
                       "text-xs px-2 py-1 rounded-md transition whitespace-nowrap",
                       pathname === "/dashboard/agent-runs" || pathname.startsWith("/dashboard/agents/runs")
-                        ? "text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground/70 hover:text-sidebar-foreground",
+                        ? "text-white"
+                        : "text-gray-400 hover:text-gray-300",
                     )}
                   >
                     Runs
@@ -137,8 +143,8 @@ export function Sidebar() {
                     className={cn(
                       "text-xs px-2 py-1 rounded-md transition whitespace-nowrap",
                       pathname === "/dashboard/agent-network" || pathname.startsWith("/dashboard/agents/network")
-                        ? "text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground/70 hover:text-sidebar-foreground",
+                        ? "text-white"
+                        : "text-gray-400 hover:text-gray-300",
                     )}
                   >
                     Network
@@ -150,8 +156,8 @@ export function Sidebar() {
         })}
 
         {/* Operations Section */}
-        <div className="pt-2 mt-4 border-t border-sidebar-border">
-          <p className="text-xs font-semibold text-sidebar-foreground/50 px-4 py-2 uppercase">Operations</p>
+        <div className="pt-2 mt-4 border-t border-gray-800">
+          <p className="text-xs font-semibold text-gray-500 px-4 py-2 uppercase">Operations</p>
           {additionalItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
             return (
@@ -161,8 +167,8 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium transition",
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50",
+                    ? "bg-gray-800 text-white"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-white",
                 )}
               >
                 <item.icon className="w-4 h-4" />
@@ -173,8 +179,8 @@ export function Sidebar() {
         </div>
 
         {/* Advanced Section */}
-        <div className="pt-2 mt-4 border-t border-sidebar-border">
-          <p className="text-xs font-semibold text-sidebar-foreground/50 px-4 py-2 uppercase">Advanced</p>
+        <div className="pt-2 mt-4 border-t border-gray-800">
+          <p className="text-xs font-semibold text-gray-500 px-4 py-2 uppercase">Advanced</p>
           {advancedItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
             return (
@@ -184,8 +190,8 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium transition",
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50",
+                    ? "bg-gray-800 text-white"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-white",
                 )}
               >
                 <item.icon className="w-4 h-4" />
@@ -197,7 +203,7 @@ export function Sidebar() {
       </nav>
 
       {/* Secondary Navigation */}
-      <div className="border-t border-sidebar-border p-4 flex-shrink-0 space-y-2">
+      <div className="border-t border-gray-800 p-4 shrink-0 space-y-2">
         {secondaryItems.map((item) => {
           const isActive = pathname === item.href
           return (
@@ -207,8 +213,8 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium transition",
                 isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/50",
+                  ? "bg-gray-800 text-white"
+                  : "text-gray-300 hover:bg-gray-800 hover:text-white",
               )}
             >
               <item.icon className="w-4 h-4" />
@@ -219,15 +225,15 @@ export function Sidebar() {
       </div>
 
       {/* User Profile */}
-      <div className="border-t border-sidebar-border p-4 flex-shrink-0">
+      <div className="border-t border-gray-800 p-4 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-sidebar-accent rounded-full"></div>
+          <div className="w-8 h-8 bg-gray-800 rounded-full"></div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-sidebar-foreground truncate">You</p>
-            <p className="text-xs text-sidebar-foreground/60 truncate">user@phantom.ai</p>
+            <p className="text-sm font-medium text-white truncate">You</p>
+            <p className="text-xs text-gray-400 truncate">user@phantom.ai</p>
           </div>
         </div>
       </div>
-    </div>
+    </motion.aside>
   )
 }

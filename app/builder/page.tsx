@@ -20,6 +20,9 @@ import AgentPolicies from "@/components/builder/agent-policies"
 import Scheduler from "@/components/builder/scheduler"
 import ExposureRules from "@/components/builder/exposure-rules"
 import BYOKeys from "@/components/builder/byo-keys"
+import Animated from "@/components/Animated"
+import AmbientBackground from "@/components/ambient"
+import { motion } from "framer-motion"
 
 const BUILDER_SECTIONS = [
   {
@@ -141,11 +144,12 @@ export default function BuilderPage() {
   }
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="relative flex h-screen bg-[#030014]">
+      <AmbientBackground />
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden ml-64" onKeyDown={handleKeyDown}>
         <DashboardHeader />
-        <div className="flex-1 overflow-hidden flex">
+        <Animated className="flex-1 overflow-hidden flex">
           <div className="w-72 border-r border-border bg-slate-50 dark:bg-slate-900/50 overflow-y-auto">
             <div className="sticky top-0 bg-slate-50 dark:bg-slate-900/50 border-b border-border p-4 z-10">
               <div className="flex items-center justify-between mb-4">
@@ -249,31 +253,31 @@ export default function BuilderPage() {
           </div>
 
           <div className="flex h-full">
-                        <h2 className="text-3xl font-bold text-foreground">
+                        <h2 className="text-3xl font-bold text-white">
                           {BUILDER_SECTIONS[currentSectionIndex].label}
                         </h2>
                       </div>
 
-                      <p className="text-muted-foreground">{BUILDER_SECTIONS[currentSectionIndex].description}</p>
+                      <p className="text-gray-400">{BUILDER_SECTIONS[currentSectionIndex].description}</p>
 
                       {/* Network & registration banner */}
                         <div className="mt-4">
                           <div className="flex items-center gap-3 text-xs">
-                            <div className="px-2 py-1 rounded bg-muted/30 text-muted-foreground">Mode:</div>
-                            <div className="font-mono text-sm">Mock Backend</div>
-                            <div className="ml-3 text-xs text-muted-foreground">{registeredInfo ? `Registered: ${String(registeredInfo.agent_id ?? registeredInfo.contractAddress ?? registeredInfo.tokenId)}` : "Not registered"}</div>
+                            <div className="px-2 py-1 rounded bg-gray-800 text-gray-400">Mode:</div>
+                            <div className="font-mono text-sm text-white">Mock Backend</div>
+                            <div className="ml-3 text-xs text-gray-400">{registeredInfo ? `Registered: ${String(registeredInfo.agent_id ?? registeredInfo.contractAddress ?? registeredInfo.tokenId)}` : "Not registered"}</div>
                           </div>
 
                           {registeredInfo && (
-                            <div className="mt-3 p-3 rounded bg-primary/5 border border-primary/10 text-sm">
-                              <div className="font-medium">Agent registered (mock)</div>
-                              <div className="mt-1 font-mono text-xs">ID: {registeredInfo.agent_id || registeredInfo.contractAddress || registeredInfo.tokenId}</div>
+                            <div className="mt-3 p-3 rounded bg-violet-500/10 border border-violet-500/20 text-sm">
+                              <div className="font-medium text-white">Agent registered (mock)</div>
+                              <div className="mt-1 font-mono text-xs text-gray-400">ID: {registeredInfo.agent_id || registeredInfo.contractAddress || registeredInfo.tokenId}</div>
                               {registeredInfo.explorer_url && (
                                 <div className="mt-2">
-                                  <a href={registeredInfo.explorer_url} target="_blank" rel="noreferrer" className="text-primary">
+                                  <a href={registeredInfo.explorer_url} target="_blank" rel="noreferrer" className="text-violet-400 hover:text-violet-300">
                                     View on explorer
                                   </a>
-                                  <a href={`/dashboard/marketplace/${registeredInfo.contract_address ?? registeredInfo.contractAddress}`} className="ml-4 text-sm">
+                                  <a href={`/dashboard/marketplace/${registeredInfo.contract_address ?? registeredInfo.contractAddress}`} className="ml-4 text-sm text-violet-400 hover:text-violet-300">
                                     View listing
                                   </a>
                                 </div>
@@ -291,12 +295,12 @@ export default function BuilderPage() {
                           onClick={async () => {
                             // noop preview action
                           }}
-                          className="p-2 hover:bg-secondary rounded-md transition"
+                          className="p-2 hover:bg-gray-800 rounded-md transition"
                         >
-                          <Eye className="w-5 h-5 text-muted-foreground" />
+                          <Eye className="w-5 h-5 text-gray-400 hover:text-white" />
                         </button>
-                        <button className="p-2 hover:bg-secondary rounded-md transition">
-                          <Code2 className="w-5 h-5 text-muted-foreground" />
+                        <button className="p-2 hover:bg-gray-800 rounded-md transition">
+                          <Code2 className="w-5 h-5 text-gray-400 hover:text-white" />
                         </button>
 
                         <div className="ml-3">
@@ -343,7 +347,7 @@ export default function BuilderPage() {
                               }
                             }}
                             disabled={registering}
-                            className="px-3 py-1 bg-accent text-foreground rounded-md text-sm"
+                            className="px-3 py-1 bg-violet-600 text-white rounded-md text-sm hover:bg-violet-700 transition"
                           >
                             {registering ? "Registering…" : "Register Agent"}
                           </button>
@@ -486,7 +490,7 @@ export default function BuilderPage() {
               </div>
             </div>
           </div>
-        </div>
+        </Animated>
       </div>
     </div>
   )
