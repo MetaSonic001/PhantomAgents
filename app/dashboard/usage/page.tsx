@@ -37,7 +37,7 @@ export default function UsagePage() {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h1 className="text-3xl font-bold mb-2">Usage & Billing</h1>
-                <p className="text-muted-foreground">Monitor your resource consumption</p>
+                <p className="text-gray-400">Monitor your resource consumption</p>
               </div>
               <div className="flex gap-2">
                 {["month", "year"].map((tf) => (
@@ -45,7 +45,7 @@ export default function UsagePage() {
                     key={tf}
                     onClick={() => setTimeframe(tf)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                      timeframe === tf ? "bg-primary text-primary-foreground" : "bg-secondary hover:bg-secondary/80"
+                      timeframe === tf ? "bg-violet-600 text-white" : "bg-gray-800/30 hover:bg-gray-800/80 text-gray-300"
                     }`}
                   >
                     {tf === "month" ? "This Month" : "This Year"}
@@ -92,34 +92,34 @@ export default function UsagePage() {
                   bgColor: "bg-red-500/10",
                 },
               ].map((item, idx) => (
-                <div key={idx} className="border border-border rounded-lg p-4 bg-card">
+                <div key={idx} className="border border-gray-800 rounded-lg p-4 bg-linear-to-br from-gray-900/50 to-gray-800/30">
                   <div className={`p-2 rounded-lg ${item.bgColor} w-fit mb-3`}>
                     <item.icon className={`w-5 h-5 ${item.color}`} />
                   </div>
-                  <p className="text-xs text-muted-foreground mb-1">{item.title}</p>
+                  <p className="text-xs text-gray-400 mb-1">{item.title}</p>
                   <p className="text-lg font-semibold mb-3">
                     {typeof item.data.used === "number" && item.data.used.toLocaleString()}
                     {item.title === "Storage" ? " GB" : item.title === "Costs" ? "" : ""}
                   </p>
                   <div className="bg-muted rounded-full h-2 mb-2">
                     <div
-                      className="bg-primary rounded-full h-2 transition-all"
+                      className="bg-violet-500 rounded-full h-2 transition-all"
                       style={{ width: `${Math.min(item.data.percentage, 100)}%` }}
                     ></div>
                   </div>
-                  <p className="text-xs text-muted-foreground">{item.data.percentage}% of limit used</p>
+                  <p className="text-xs text-gray-400">{item.data.percentage}% of limit used</p>
                 </div>
               ))}
             </div>
 
             {/* Detailed Table */}
-            <div className="border border-border rounded-lg bg-card overflow-hidden">
+            <div className="border border-gray-800 rounded-lg bg-linear-to-br from-gray-900/50 to-gray-800/30 overflow-hidden">
               <div className="p-6 border-b border-border">
                 <h2 className="text-xl font-semibold">Resource Details</h2>
               </div>
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-secondary/30">
+                  <tr className="border-b border-gray-800 bg-gray-800/30">
                     <th className="px-6 py-3 text-left font-semibold">Resource</th>
                     <th className="px-6 py-3 text-left font-semibold">Used</th>
                     <th className="px-6 py-3 text-left font-semibold">Limit</th>
@@ -143,7 +143,7 @@ export default function UsagePage() {
                     { name: "Storage", used: `${current.storage.used} GB`, limit: `${current.storage.limit} GB` },
                     { name: "Monthly Costs", used: `$${current.cost.used}`, limit: `$${current.cost.limit}` },
                   ].map((row, idx) => (
-                    <tr key={idx} className="border-b border-border hover:bg-secondary/20 transition">
+                    <tr key={idx} className="border-b border-gray-800 hover:bg-gray-800/20 transition">
                       <td className="px-6 py-3 font-medium">{row.name}</td>
                       <td className="px-6 py-3">{row.used}</td>
                       <td className="px-6 py-3">{row.limit}</td>

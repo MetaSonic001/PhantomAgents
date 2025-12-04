@@ -51,13 +51,13 @@ export default function VersionControlPage() {
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Version Control & A/B Testing</h1>
-        <p className="text-foreground/60">Manage agent versions and run performance tests</p>
+        <p className="text-gray-400">Manage agent versions and run performance tests</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Version History */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="border border-border rounded-lg p-6 bg-background">
+          <div className="border border-gray-800 rounded-lg p-6 bg-linear-to-br from-gray-900/50 to-gray-800/30">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <GitBranch className="w-5 h-5" />
               Version History
@@ -65,13 +65,13 @@ export default function VersionControlPage() {
 
             <div className="space-y-3">
               {mockVersions.map((ver) => (
-                <div key={ver.id} className="p-4 border border-border rounded-lg hover:bg-secondary/30 transition">
+                <div key={ver.id} className="p-4 border border-gray-800 rounded-lg hover:bg-gray-800/30 transition">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
                         <span className="font-semibold">{ver.version}</span>
                         {ver.tag && (
-                          <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded">{ver.tag}</span>
+                          <span className="text-xs px-2 py-1 bg-violet-500/10 text-violet-400 rounded">{ver.tag}</span>
                         )}
                       </div>
                       <span
@@ -82,14 +82,14 @@ export default function VersionControlPage() {
                         {ver.status}
                       </span>
                     </div>
-                    <p className="text-xs text-foreground/60">{ver.date}</p>
+                    <p className="text-xs text-gray-400">{ver.date}</p>
                   </div>
 
-                  <p className="text-xs text-foreground/60 mb-2">by {ver.author}</p>
+                  <p className="text-xs text-gray-400 mb-2">by {ver.author}</p>
 
                   <div className="flex flex-wrap gap-1">
                     {ver.changes.map((change, idx) => (
-                      <span key={idx} className="text-xs px-2 py-1 bg-secondary rounded">
+                      <span key={idx} className="text-xs px-2 py-1 bg-gray-800/30 rounded text-gray-300">
                         {change}
                       </span>
                     ))}

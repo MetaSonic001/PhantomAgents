@@ -15,10 +15,10 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Analytics</h1>
-          <p className="text-muted-foreground">Deep performance insights for your agents</p>
+          <h1 className="text-3xl font-bold mb-2 text-white">Analytics</h1>
+          <p className="text-gray-400">Deep performance insights for your agents</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-secondary transition font-medium text-sm">
+        <button className="flex items-center gap-2 px-4 py-2 border border-gray-700 rounded-md hover:bg-gray-800 transition font-medium text-sm text-gray-300">
           <Download className="w-4 h-4" />
           Export Data
         </button>
@@ -29,14 +29,14 @@ export default function AnalyticsPage() {
         <div className="flex gap-2">
           {(["Overview", "Advanced"] as const).map((t) => (
             <button
-              key={t}
-              onClick={() => setActiveTab(t)}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition ${
-                activeTab === t ? "bg-primary text-primary-foreground" : "border border-border hover:bg-secondary"
-              }`}
-            >
-              {t}
-            </button>
+                key={t}
+                onClick={() => setActiveTab(t)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                  activeTab === t ? "bg-violet-600 text-white" : "border border-gray-700 text-gray-300 hover:bg-gray-800"
+                }`}
+              >
+                {t}
+              </button>
           ))}
         </div>
         <div>
