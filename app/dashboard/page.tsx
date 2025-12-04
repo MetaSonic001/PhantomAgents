@@ -1,47 +1,138 @@
 "use client"
 
-import { MoreVertical, ArrowUpRight, Play, ShoppingCart } from "lucide-react"
+import { MoreVertical, ArrowUpRight, Play, ShoppingCart, Zap, DollarSign } from "lucide-react"
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { agentApi } from "@/lib/api-client"
-
-const mockActivities = [
-  { agent: "Crypto Trader Pro", action: "Trade Executed", type: "success", time: "2 mins ago" },
-  { agent: "Market Oracle", action: "Prediction Published", type: "success", time: "5 mins ago" },
-  { agent: "DAO Delegate", action: "Vote Cast", type: "success", time: "1 hour ago" },
-  { agent: "Crypto Trader Pro", action: "Signal Generated", type: "success", time: "15 mins ago" },
-]
+import { agentApi, demoApi } from "@/lib/api-client"
+import { toast } from "@/components/toast"
 
 export default function DashboardPage() {
   const [agents, setAgents] = useState<any[]>([])
+  const [activities, setActivities] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [demoLoading, setDemoLoading] = useState(false)
 
   useEffect(() => {
-    async function loadAgents() {
+    async function loadDashboardData() {
       try {
+        // Load agents
         const response = await agentApi.getAll()
         const agentsList = response.agents || []
+        
         // Map backend agents to dashboard format
         const mapped = agentsList.map((agent: any) => ({
           id: agent.id,
           name: agent.name,
           status: agent.status === "registered" ? "active" : "idle",
-          lastAction: "2 mins ago", // TODO: compute from actual actions
+          lastAction: "2 mins ago",
           actionsToday: agent.action_count || 0,
           revenue: agent.revenue || 0,
           type: agent.description || "AI Agent",
         }))
         setAgents(mapped)
+
+        // Load recent activities from backend
+        const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
+        try {
+          // Get actions from all agents
+          const activityPromises = mapped.slice(0, 3).map(async (agent: any) => {
+            try {
+              const actResponse = await fetch(`${BASE_URL}/agents/${agent.id}/actions`)
+              if (actResponse.ok) {
+                const actData = await actResponse.json()
+                return actData.actions?.slice(0, 2).map((action: any) => ({
+                  agent: agent.name,
+                  action: action.type || action.output || "Action executed",
+                  type: "success",
+                  time: action.timestamp || "Recently",
+                })) || []
+              }
+            } catch (e) {
+              return []
+            }
+            return []
+          })
+          
+          const activityArrays = await Promise.all(activityPromises)
+          const recentActivities = activityArrays.flat().slice(0, 5)
+          
+          // If no activities from backend, show demo data
+          if (recentActivities.length === 0) {
+            setActivities([
+              { agent: "Demo Agent", action: "System initialized", type: "success", time: "Just now" },
+              { agent: "System", action: "Backend connected", type: "success", time: "Recently" },
+            ])
+          } else {
+            setActivities(recentActivities)
+          }
+        } catch (error) {
+          console.error("Failed to load activities:", error)
+          setActivities([])
+        }
       } catch (error) {
         console.error("Failed to load agents:", error)
-        // Keep empty array on error
+        toast.error("Failed to load dashboard data")
       } finally {
         setLoading(false)
       }
     }
-    loadAgents()
+    loadDashboardData()
   }, [])
+
+  const refreshDashboard = async () => {
+    setLoading(true)
+    try {
+      const response = await agentApi.getAll()
+      const agentsList = response.agents || []
+      const mapped = agentsList.map((agent: any) => ({
+        id: agent.id,
+        name: agent.name,
+        status: agent.status === "registered" ? "active" : "idle",
+        lastAction: "2 mins ago",
+        actionsToday: agent.action_count || 0,
+        revenue: agent.revenue || 0,
+        type: agent.description || "AI Agent",
+      }))
+      setAgents(mapped)
+      toast.success("Dashboard refreshed!")
+    } catch (error) {
+      console.error("Failed to refresh:", error)
+      toast.error("Failed to refresh dashboard")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDemoAction = async (agentId: string) => {
+    if (demoLoading) return
+    setDemoLoading(true)
+    try {
+      const result = await demoApi.simulateAction(agentId, "signal")
+      toast.success(result.message || "Demo action executed!")
+      await refreshDashboard()
+    } catch (error: any) {
+      console.error("Demo action failed:", error)
+      toast.error(error.message || "Failed to execute demo action")
+    } finally {
+      setDemoLoading(false)
+    }
+  }
+
+  const handleAddRevenue = async (agentId: string, amount: number) => {
+    if (demoLoading) return
+    setDemoLoading(true)
+    try {
+      const result = await demoApi.addRevenue(agentId, amount)
+      toast.success(result.message || `Added $${amount} revenue!`)
+      await refreshDashboard()
+    } catch (error: any) {
+      console.error("Add revenue failed:", error)
+      toast.error(error.message || "Failed to add revenue")
+    } finally {
+      setDemoLoading(false)
+    }
+  }
 
   const totalAgents = agents.length
   const activeAgents = agents.filter((a) => a.status === "active").length
@@ -91,7 +182,7 @@ export default function DashboardPage() {
         <motion.div layout className="lg:col-span-2 rounded-2xl p-6 bg-card border border-border">
           <motion.h2 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="text-lg font-semibold mb-6">Activity Feed</motion.h2>
           <div className="space-y-4">
-            {mockActivities.map((activity, i) => (
+            {activities.length > 0 ? activities.map((activity, i) => (
               <motion.div key={i} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35, delay: i * 0.05 }} className="flex items-center justify-between py-4 border-b border-border last:border-b-0">
                 <div className="flex-1">
                   <p className="text-sm font-medium text-foreground">{activity.agent}</p>
@@ -104,7 +195,12 @@ export default function DashboardPage() {
                 </span>
                 <p className="text-xs text-muted-foreground ml-4">{activity.time}</p>
               </motion.div>
-            ))}
+            )) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>No recent activities</p>
+                <p className="text-xs mt-2">Run an agent to see activity here</p>
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -138,14 +234,67 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className="rounded-2xl p-6 bg-card border border-border">
-            <h3 className="text-sm font-semibold mb-4">Account Balance</h3>
+            <h3 className="text-sm font-semibold mb-4">Earnings Overview</h3>
             <div className="mb-4">
-              <p className="text-3xl font-bold text-foreground">$5,847.90</p>
-              <p className="text-xs text-muted-foreground">Available</p>
+              <p className="text-3xl font-bold text-foreground">${totalRevenue.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">Total Revenue</p>
             </div>
-            <button className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition text-sm font-medium">
-              Withdraw
-            </button>
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+              <div>
+                <p className="text-xs text-muted-foreground">Active Agents</p>
+                <p className="text-lg font-bold text-foreground">{activeAgents}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Total Actions</p>
+                <p className="text-lg font-bold text-foreground">{totalActions}</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Demo Controls */}
+          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="rounded-2xl p-6 bg-linear-to-br from-violet-500/10 to-indigo-500/10 border border-violet-500/20">
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="w-5 h-5 text-violet-400" />
+              <h3 className="text-sm font-semibold">Demo Controls</h3>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4">Simulate agent actions and revenue to see live updates</p>
+            
+            {agents.length > 0 ? (
+              <div className="space-y-3">
+                {agents.slice(0, 2).map((agent) => (
+                  <div key={agent.id} className="p-3 rounded-lg bg-card/50 border border-border">
+                    <p className="text-xs font-medium mb-2 truncate">{agent.name}</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleDemoAction(agent.id)}
+                        disabled={demoLoading}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Zap className="w-3 h-3" />
+                        Run Action
+                      </button>
+                      <button
+                        onClick={() => handleAddRevenue(agent.id, 25)}
+                        disabled={demoLoading}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 transition text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <DollarSign className="w-3 h-3" />
+                        +$25
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                <button
+                  onClick={refreshDashboard}
+                  disabled={loading}
+                  className="w-full py-2 px-3 bg-secondary border border-border rounded-md hover:bg-secondary/80 transition text-xs font-medium disabled:opacity-50"
+                >
+                  {loading ? "Refreshing..." : "Refresh Dashboard"}
+                </button>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground text-center py-4">Create an agent to use demo controls</p>
+            )}
           </motion.div>
         </div>
       </div>

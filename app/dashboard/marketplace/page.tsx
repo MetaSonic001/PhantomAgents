@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Search, Star, TrendingUp } from "lucide-react"
 import { motion } from "framer-motion"
 import { marketplaceApi } from "@/lib/api-client"
+import { toast } from "@/components/toast"
 
 const CATEGORIES = ["All", "Trading", "Research", "Governance", "Productivity", "Social"]
 
@@ -47,12 +48,13 @@ export default function MarketplacePage() {
   }, [])
 
   const handleSubscribe = async (agentId: string) => {
+    toast.info("Processing subscription...")
     try {
       const response = await marketplaceApi.subscribe(agentId)
-      alert(`Successfully subscribed to agent! Subscription ID: ${response.subscription_id}`)
-    } catch (error) {
+      toast.success(`✅ Successfully subscribed! Subscription ID: ${response.subscription_id}`)
+    } catch (error: any) {
       console.error("Failed to subscribe:", error)
-      alert("Failed to subscribe to agent")
+      toast.error(error.message || "Failed to subscribe to agent")
     }
   }
 

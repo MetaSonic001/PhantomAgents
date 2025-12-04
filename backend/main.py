@@ -1172,6 +1172,112 @@ async def analytics_agent(agent_id: str):
         "run_history": run_history
     }
 
+
+# ==========================================
+# DEMO/SIMULATION ENDPOINTS
+# ==========================================
+
+@app.post("/demo/add-revenue")
+async def demo_add_revenue(body: Dict[str, Any], user_id: str = Depends(get_user_id)):
+    """Demo endpoint to simulate revenue generation"""
+    agent_id = body.get("agent_id")
+    amount = float(body.get("amount", 0))
+    
+    if agent_id not in agents_db:
+        raise HTTPException(404, "Agent not found")
+    
+    agent = agents_db[agent_id]
+    agent["revenue"] = agent.get("revenue", 0) + amount
+    agent["action_count"] = agent.get("action_count", 0) + 1
+    
+    # Create a demo action
+    action_id = compute_hash(f"{agent_id}{user_id}{time.time()}")[:16]
+    action = {
+        "id": action_id,
+        "agent_id": agent_id,
+        "type": "demo_revenue",
+        "input": f"Demo action to generate ${amount} revenue",
+        "output": f"Revenue of ${amount} added successfully",
+        "timestamp": datetime.utcnow().isoformat(),
+        "proof_id": f"proof_{action_id}",
+        "tx_hash": f"0x{action_id}",
+        "status": "verified"
+    }
+    actions_db[action_id] = action
+    
+    return {
+        "success": True,
+        "agent_id": agent_id,
+        "amount_added": amount,
+        "new_revenue": agent["revenue"],
+        "action_id": action_id,
+        "message": f"✅ Added ${amount} revenue to {agent['name']}"
+    }
+
+
+@app.post("/demo/simulate-action")
+async def demo_simulate_action(body: Dict[str, Any], user_id: str = Depends(get_user_id)):
+    """Demo endpoint to simulate agent action without LLM"""
+    agent_id = body.get("agent_id")
+    action_type = body.get("action_type", "signal")
+    
+    if agent_id not in agents_db:
+        raise HTTPException(404, "Agent not found")
+    
+    agent = agents_db[agent_id]
+    
+    # Simulate action result
+    action_results = {
+        "signal": "BUY signal detected with 85% confidence",
+        "vote": "Voted YES on proposal #123",
+        "predict": "Price prediction: $45,230 (+5.2%)",
+        "publish": "Published market analysis report"
+    }
+    
+    result = action_results.get(action_type, "Action executed successfully")
+    
+    # Generate mock proof
+    proof = generate_noir_proof_mock(agent, result, action_type)
+    
+    # Create action record
+    action_id = compute_hash(f"{agent_id}{user_id}{time.time()}")[:16]
+    action = {
+        "id": action_id,
+        "agent_id": agent_id,
+        "type": action_type,
+        "input": f"Demo {action_type} action",
+        "output": result,
+        "timestamp": datetime.utcnow().isoformat(),
+        "proof_id": proof["proof_hash"],
+        "tx_hash": f"0x{compute_hash(action_id)[:12]}",
+        "status": "verified"
+    }
+    actions_db[action_id] = action
+    proofs_db[proof["proof_hash"]] = {
+        "id": proof["proof_hash"],
+        "agent_id": agent_id,
+        "proof": proof,
+        "created_at": datetime.utcnow().isoformat(),
+        "verified": True
+    }
+    
+    # Update agent stats
+    agent["action_count"] = agent.get("action_count", 0) + 1
+    agent["proof_count"] = agent.get("proof_count", 0) + 1
+    
+    # Add some revenue (10-50 dollars per action)
+    import random
+    revenue_amount = random.uniform(10, 50)
+    agent["revenue"] = agent.get("revenue", 0) + revenue_amount
+    
+    return {
+        "success": True,
+        "action": action,
+        "proof": proof,
+        "revenue_generated": round(revenue_amount, 2),
+        "message": f"✅ {agent['name']} executed {action_type} action"
+    }
+
 @app.get("/api/marketplace/agents")
 async def get_marketplace_agents():
     """Get all marketplace listed agents"""

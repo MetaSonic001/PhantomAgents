@@ -8,6 +8,7 @@ import Animated from "@/components/Animated"
 import AmbientBackground from "@/components/ambient"
 import { motion } from "framer-motion"
 import { agentApi } from "@/lib/api-client"
+import { toast } from "@/components/toast"
 
 export default function MyAgentsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -47,6 +48,7 @@ export default function MyAgentsPage() {
   }, [])
 
   const handleRunAgent = async (agentId: string) => {
+    toast.info("Running agent...")
     try {
       const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
       const response = await fetch(`${BASE_URL}/agents/${agentId}/run`, {
@@ -59,37 +61,54 @@ export default function MyAgentsPage() {
         }),
       })
       if (response.ok) {
-        alert("Agent executed successfully!")
+        const result = await response.json()
+        toast.success("✅ Agent executed successfully!")
+        // Refresh agents to show updated action count
+        const updated = await agentApi.getAll()
+        const mapped = updated.agents?.map((agent: any) => ({
+          id: agent.id,
+          name: agent.name,
+          type: agent.description || "AI Agent",
+          status: agent.status === "registered" ? "active" : "inactive",
+          created: new Date(agent.created_at).toLocaleDateString(),
+          lastModified: new Date(agent.created_at).toLocaleDateString(),
+          performance: agent.performance || "-",
+          subscribers: agent.subscribers || 0,
+          revenue: agent.revenue || 0,
+          private: agent.visibility === "private",
+        })) || []
+        setAgents(mapped)
       } else {
         const error = await response.json()
-        alert(`Failed to run agent: ${error.detail || "Unknown error"}`)
+        toast.error(`Failed to run agent: ${error.detail || "Unknown error"}`)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to run agent:", error)
-      alert("Failed to run agent. Make sure your API keys are configured.")
+      toast.error(error.message || "Failed to run agent. Make sure your API keys are configured.")
     }
   }
 
   const handlePauseAgent = (agentId: string) => {
-    alert(`Pausing agent ${agentId}`)
+    toast.info(`Agent paused/resumed`)
   }
 
   const handleDeleteAgent = async (agentId: string) => {
     if (!confirm("Are you sure you want to delete this agent?")) return
+    toast.info("Deleting agent...")
     try {
       await agentApi.delete(agentId)
       setAgents(agents.filter((a) => a.id !== agentId))
-      alert("Agent deleted successfully!")
-    } catch (error) {
+      toast.success("✅ Agent deleted successfully!")
+    } catch (error: any) {
       console.error("Failed to delete agent:", error)
-      alert("Failed to delete agent")
+      toast.error(error.message || "Failed to delete agent")
     }
   }
 
   const handleShareAgent = (agentId: string) => {
-    const url = `${window.location.origin}/marketplace/${agentId}`
+    const url = `${window.location.origin}/dashboard/marketplace/${agentId}`
     navigator.clipboard.writeText(url)
-    alert("Agent URL copied to clipboard!")
+    toast.success("✅ Agent URL copied to clipboard!")
   }
 
   return (

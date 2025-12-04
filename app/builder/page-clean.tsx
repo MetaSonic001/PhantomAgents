@@ -30,9 +30,6 @@ const BUILDER_SECTIONS = [
   { id: "testing", label: "Testing & Deploy", icon: "🚀", description: "Test, preview, and deploy your agent", badge: "DEPLOYMENT" },
 ]
 
-const glassCard = "rounded-2xl border border-white/15 bg-white/80 dark:bg-white/5 backdrop-blur-2xl shadow-xl"
-const glassPanel = "border border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-2xl shadow-lg"
-
 type AgentData = {
   name: string
   tagline: string
@@ -98,8 +95,8 @@ export default function BuilderPage() {
         <DashboardHeader />
         <Animated className="flex-1 overflow-hidden flex">
           {/* Builder Steps Sidebar */}
-          <div className="w-80 border-r border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-2xl overflow-y-auto">
-            <div className="sticky top-0 bg-transparent border-b border-white/10 p-4 z-10 backdrop-blur-2xl">
+          <div className="w-80 border-r border-border bg-card overflow-y-auto">
+            <div className="sticky top-0 bg-card border-b border-border p-4 z-10">
               <div className="flex items-center justify-between mb-4">
                 <h1 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Agent Builder</h1>
                 <div className="text-xs font-medium text-primary">{Math.round(progressPercentage)}%</div>
@@ -155,7 +152,7 @@ export default function BuilderPage() {
               })}
             </div>
 
-            <div className={`p-4 mt-4 ${glassCard}`}>
+            <div className="border-t border-border p-4 mt-4">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Info</p>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-xs">
@@ -175,9 +172,9 @@ export default function BuilderPage() {
           </div>
 
           {/* Main Content Area */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-white/50 via-transparent to-white/10 dark:from-white/10 dark:via-transparent dark:to-white/5">
+          <div className="flex-1 flex flex-col overflow-hidden">
             {/* Header */}
-            <div className={`${glassPanel} border-b border-white/10 px-8 py-6`}>
+            <div className="border-b border-border bg-card px-8 py-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -266,7 +263,7 @@ export default function BuilderPage() {
                 )}
                 {activeSection === "monetization" && (
                   <div className="space-y-6">
-                    <div className={`${glassCard} p-6`}>
+                    <div className="border border-border rounded-lg p-6 bg-card">
                       <h3 className="font-semibold mb-4 text-lg">Pricing Strategy</h3>
                       <div className="space-y-4">
                         <div>
@@ -291,7 +288,7 @@ export default function BuilderPage() {
                 )}
                 {activeSection === "testing" && (
                   <div className="space-y-6">
-                    <div className={`${glassCard} p-6`}>
+                    <div className="border border-border rounded-lg p-6 bg-card">
                       <h3 className="font-semibold mb-4 text-lg">Dry Run Test</h3>
                       <textarea placeholder="Enter test input..." className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm mb-4" rows={4}></textarea>
                       <button className="w-full px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition font-medium flex items-center justify-center gap-2">
@@ -299,10 +296,10 @@ export default function BuilderPage() {
                         Run Test
                       </button>
                     </div>
-                    <div className={`${glassCard} p-6`}>
+                    <div className="border border-border rounded-lg p-6 bg-card">
                       <Scheduler agentName={agentData.name} />
                     </div>
-                    <div className={`${glassCard} p-6`}>
+                    <div className="border border-border rounded-lg p-6 bg-card">
                       <h3 className="font-semibold mb-4 text-lg">Deployment</h3>
                       <p className="text-sm text-muted-foreground mb-4">Ready to deploy your agent to production</p>
                       <button className="w-full px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition font-medium">

@@ -1,14 +1,60 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Download, TrendingUp, TrendingDown, Calendar, Filter, BarChart3, AlertCircle, Target, Zap } from "lucide-react"
+import { agentApi, analyticsApi } from "@/lib/api-client"
 
 export default function AnalyticsPage() {
   const [dateRange, setDateRange] = useState("Last 30 Days")
   const [selectedAgent, setSelectedAgent] = useState("all")
   const [activeTab, setActiveTab] = useState<"Overview" | "Advanced">("Overview")
+  const [agents, setAgents] = useState<any[]>([])
+  const [analytics, setAnalytics] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-  const agents = ["all", "Crypto Trader Pro", "Market Oracle", "DAO Delegate"]
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const response = await agentApi.getAll()
+        const agentsList = response.agents || []
+        setAgents([{ id: "all", name: "All Agents" }, ...agentsList])
+        
+        // Load analytics for selected agent
+        if (selectedAgent !== "all") {
+          const agentAnalytics = await analyticsApi.getAgentAnalytics(selectedAgent)
+          setAnalytics(agentAnalytics)
+        } else {
+          // Aggregate analytics from all agents
+          const allAnalytics = await Promise.all(
+            agentsList.map((a: any) => analyticsApi.getAgentAnalytics(a.id).catch(() => null))
+          )
+          const aggregated = {
+            usage_count: allAnalytics.reduce((sum, a) => sum + (a?.usage_count || 0), 0),
+            accuracy_score: allAnalytics.reduce((sum, a) => sum + (a?.accuracy_score || 0), 0) / allAnalytics.filter(Boolean).length || 0,
+            roi: allAnalytics.reduce((sum, a) => sum + (a?.roi || 0), 0) / allAnalytics.filter(Boolean).length || 0,
+            run_history: []
+          }
+          setAnalytics(aggregated)
+        }
+      } catch (error) {
+        console.error("Failed to load analytics:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
+  }, [selectedAgent])
+
+  if (loading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading analytics...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="p-8 space-y-8">
@@ -71,8 +117,8 @@ export default function AnalyticsPage() {
             className="px-3 py-2 rounded-md border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
             {agents.map((agent) => (
-              <option key={agent} value={agent}>
-                {agent === "all" ? "All Agents" : agent}
+              <option key={agent.id} value={agent.id}>
+                {agent.name}
               </option>
             ))}
           </select>
@@ -83,10 +129,10 @@ export default function AnalyticsPage() {
       {activeTab === "Overview" && (
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { label: "Total Actions", value: "12,456", change: "+22%", positive: true },
-          { label: "Success Rate", value: "94.2%", change: "+3.1%", positive: true },
-          { label: "Avg Response Time", value: "245ms", change: "-12%", positive: true },
-          { label: "Error Count", value: "234", change: "-5%", positive: true },
+          { label: "Total Actions", value: analytics?.usage_count?.toString() || "0", change: "+22%", positive: true },
+          { label: "Accuracy Score", value: `${((analytics?.accuracy_score || 0) * 100).toFixed(1)}%`, change: "+3.1%", positive: true },
+          { label: "ROI", value: `${(analytics?.roi || 0).toFixed(2)}x`, change: "+15%", positive: true },
+          { label: "Run History", value: analytics?.run_history?.length?.toString() || "0", change: "-", positive: true },
         ].map((metric) => (
           <div
             key={metric.label}
