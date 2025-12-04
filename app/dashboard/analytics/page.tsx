@@ -316,40 +316,72 @@ export default function AnalyticsPage() {
         </div>
       )}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Action Volume - simple bar chart */}
+        {/* Action Volume - Line graph */}
         <div className="border border-border rounded-lg p-6 bg-card">
           <h2 className="text-lg font-bold mb-4">Action Volume</h2>
-          <div className="h-64 rounded-lg bg-secondary/20 p-4 flex items-end gap-3">
-            {actionVolumeSeries.map((point) => (
-              <div key={point.label} className="flex-1 flex flex-col items-center gap-2">
-                <div className="w-full h-40 bg-secondary/40 rounded-full overflow-hidden flex items-end">
-                  <div
-                    className="w-full bg-primary rounded-full transition-all"
-                    style={{ height: `${Math.min(point.value, 100)}%` }}
-                  />
-                </div>
-                <span className="text-xs text-muted-foreground">{point.label}</span>
-              </div>
-            ))}
+          <div className="h-64 rounded-lg bg-secondary/20 px-4 pt-4 pb-6 flex flex-col justify-between">
+            <svg viewBox="0 0 100 60" className="w-full h-full">
+              <defs>
+                <linearGradient id="actionLine" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="hsl(var(--chart-1))" />
+                  <stop offset="100%" stopColor="hsl(var(--chart-2))" />
+                </linearGradient>
+                <linearGradient id="actionFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(var(--chart-1))" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="transparent" />
+                </linearGradient>
+              </defs>
+              {(() => {
+                const max = Math.max(...actionVolumeSeries.map((p) => p.value))
+                const pts = actionVolumeSeries.map((p, idx) => {
+                  const x = (idx / (actionVolumeSeries.length - 1 || 1)) * 100
+                  const y = 55 - (p.value / max) * 40
+                  return { x, y }
+                })
+                const path = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ")
+                const fillPath =
+                  path + ` L ${pts[pts.length - 1].x} 60 L ${pts[0].x} 60 Z`
+                return (
+                  <>
+                    <path d={fillPath} fill="url(#actionFill)" />
+                    <path d={path} fill="none" stroke="url(#actionLine)" strokeWidth="1.5" />
+                    {pts.map((p, idx) => (
+                      <circle
+                        key={idx}
+                        cx={p.x}
+                        cy={p.y}
+                        r={1.2}
+                        fill="white"
+                        stroke="hsl(var(--chart-1))"
+                        strokeWidth={0.6}
+                      />
+                    ))}
+                  </>
+                )
+              })()}
+            </svg>
+            <div className="flex justify-between mt-2 text-[11px] text-muted-foreground">
+              {actionVolumeSeries.map((p) => (
+                <span key={p.label}>{p.label}</span>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Success Rate by Type - horizontal bars */}
+        {/* Success Rate by Type - Bar chart */}
         <div className="border border-border rounded-lg p-6 bg-card">
           <h2 className="text-lg font-bold mb-4">Success Rate by Type</h2>
-          <div className="space-y-3">
+          <div className="h-64 rounded-lg bg-secondary/20 px-4 pt-4 pb-6 flex items-end gap-4">
             {successByType.map((item) => (
-              <div key={item.label}>
-                <div className="flex justify-between mb-1 text-xs">
-                  <span className="font-medium text-foreground">{item.label}</span>
-                  <span className="text-muted-foreground">{item.value}%</span>
-                </div>
-                <div className="h-2 w-full bg-secondary/40 rounded-full overflow-hidden">
+              <div key={item.label} className="flex-1 flex flex-col items-center gap-2">
+                <div className="w-full h-40 bg-secondary/40 rounded-md overflow-hidden flex items-end">
                   <div
-                    className="h-full bg-primary rounded-full transition-all"
-                    style={{ width: `${Math.min(item.value, 100)}%` }}
+                    className="w-full bg-primary rounded-md transition-all"
+                    style={{ height: `${Math.min(item.value, 100)}%` }}
                   />
                 </div>
+                <span className="text-xs text-muted-foreground">{item.label}</span>
+                <span className="text-[11px] text-foreground font-medium">{item.value}%</span>
               </div>
             ))}
           </div>
@@ -358,41 +390,91 @@ export default function AnalyticsPage() {
 
       {/* Detailed Metrics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Cost Breakdown */}
-        <div className="border border-border rounded-lg p-6 bg-card">
-          <h2 className="text-lg font-bold mb-4">Cost Breakdown</h2>
-          <div className="space-y-3">
-            {costBreakdown.map((item) => (
-              <div key={item.label} className="flex items-center justify-between gap-4">
-                <div className="flex-1">
-                  <p className="text-xs font-medium text-foreground mb-1">{item.label}</p>
-                  <div className="h-2 w-full bg-secondary/40 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary rounded-full transition-all"
-                      style={{ width: `${Math.min(item.value, 100)}%` }}
+        {/* Cost Breakdown - Pie chart */}
+        <div className="border border-border rounded-lg p-6 bg-card flex flex-col md:flex-row items-center gap-6">
+          <div className="flex-1">
+            <h2 className="text-lg font-bold mb-4">Cost Breakdown</h2>
+            <div className="space-y-3">
+              {costBreakdown.map((item, idx) => (
+                <div key={item.label} className="flex items-center justify-between gap-4 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-3 h-3 rounded-full"
+                      style={{
+                        backgroundColor:
+                          idx === 0
+                            ? "hsl(var(--chart-1))"
+                            : idx === 1
+                              ? "hsl(var(--chart-2))"
+                              : idx === 2
+                                ? "hsl(var(--chart-3))"
+                                : "hsl(var(--chart-4))",
+                      }}
                     />
+                    <span className="font-medium text-foreground">{item.label}</span>
+                  </div>
+                  <span className="text-muted-foreground">{item.value}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="w-40 h-40 md:w-44 md:h-44 rounded-full border border-border relative">
+            {(() => {
+              const total = costBreakdown.reduce((sum, i) => sum + i.value, 0)
+              let current = 0
+              const segments: string[] = []
+              const colors = [
+                "hsl(var(--chart-1))",
+                "hsl(var(--chart-2))",
+                "hsl(var(--chart-3))",
+                "hsl(var(--chart-4))",
+              ]
+              costBreakdown.forEach((item, idx) => {
+                const start = current
+                const valuePercent = (item.value / total) * 100
+                const end = start + valuePercent
+                segments.push(`${colors[idx]} ${start}% ${end}%`)
+                current = end
+              })
+              return (
+                <div
+                  className="w-full h-full rounded-full"
+                  style={{ backgroundImage: `conic-gradient(${segments.join(", ")})` }}
+                >
+                  <div className="w-20 h-20 md:w-22 md:h-22 bg-card rounded-full absolute inset-0 m-auto flex flex-col items-center justify-center text-center">
+                    <p className="text-[11px] text-muted-foreground">Model Usage</p>
+                    <p className="text-sm font-semibold text-foreground">58%</p>
                   </div>
                 </div>
-                <span className="text-xs text-muted-foreground">{item.value}%</span>
-              </div>
-            ))}
+              )
+            })()}
           </div>
         </div>
 
-        {/* Performance Trends - mini sparkline */}
+        {/* Performance Trends - percentage metrics */}
         <div className="border border-border rounded-lg p-6 bg-card">
           <h2 className="text-lg font-bold mb-4">Performance Trends</h2>
-          <div className="h-64 rounded-lg bg-secondary/20 p-4 flex items-end gap-2">
-            {performanceTrend.map((v, idx) => (
-              <div key={idx} className="flex-1 flex items-end">
-                <div
-                  className="w-full h-40 bg-secondary/40 rounded-full overflow-hidden flex items-end"
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            {[
+              { label: "Win Rate (7d)", value: "94.2%", delta: "+2.1%", positive: true },
+              { label: "Latency Change", value: "-12%", delta: "+1.4%", positive: true },
+              { label: "Cost / Action", value: "$0.042", delta: "-8.5%", positive: true },
+              { label: "Error Rate", value: "1.3%", delta: "-0.4%", positive: true },
+            ].map((metric) => (
+              <div
+                key={metric.label}
+                className="border border-border rounded-lg p-4 bg-secondary/20 flex flex-col gap-1"
+              >
+                <p className="text-xs text-muted-foreground">{metric.label}</p>
+                <p className="text-xl font-bold text-foreground">{metric.value}</p>
+                <p
+                  className={`text-[11px] flex items-center gap-1 ${
+                    metric.positive ? "text-green-600" : "text-red-600"
+                  }`}
                 >
-                  <div
-                    className="w-full bg-primary rounded-full transition-all"
-                    style={{ height: `${Math.min(v, 100)}%` }}
-                  />
-                </div>
+                  {metric.positive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                  {metric.delta} vs last period
+                </p>
               </div>
             ))}
           </div>
