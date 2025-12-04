@@ -59,3 +59,19 @@ coverage-final.json
 # Optional: ignore secret key files used by some platforms
 local.settings.json
 
+
+# Build artifacts (Cairo / Noir / generic targets)
+contracts/target/
+circuits/target/
+circuits/out/
+circuits/proofs/
+
+# Scarb / Cairo lock / build files
+contracts/Scarb.lock
+
+# Nargo / Noir artifacts
+.nargo/
+
+# Ignore any nested target directories produced by toolchains
+**/target/
+

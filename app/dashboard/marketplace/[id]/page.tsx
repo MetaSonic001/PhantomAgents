@@ -38,6 +38,39 @@ export default function AgentDetailsPage({ params }: { params: { id: string } })
   const router = useRouter()
   const { id } = React.use(params)
 
+  const [onChainMeta, setOnChainMeta] = useState<any | null>(null)
+  const [metaLoading, setMetaLoading] = useState(false)
+
+  useEffect(() => {
+    let mounted = true
+    const loadMeta = async () => {
+      setMetaLoading(true)
+      try {
+        // If id looks like an address, call the contract API
+        if (typeof id === "string" && id.startsWith("0x")) {
+          const res = await fetch(`/api/starknet/contract/${id}`)
+          const j = await res.json()
+          if (mounted) setOnChainMeta(j)
+        } else {
+          // Try localStorage mapping
+          const items = JSON.parse(localStorage.getItem("phantom.seller.listings") || "[]")
+          const match = items.find((it: any) => it.id === id || it.agentData?.name === id)
+          if (match) {
+            if (mounted) setOnChainMeta(match.onChain || null)
+          }
+        }
+      } catch (e) {
+        console.error(e)
+      } finally {
+        if (mounted) setMetaLoading(false)
+      }
+    }
+    loadMeta()
+    return () => {
+      mounted = false
+    }
+  }, [id])
+
   const [reviews, setReviews] = useState<Review[]>([])
   const [rating, setRating] = useState(5)
   const [comment, setComment] = useState("")
@@ -71,6 +104,15 @@ export default function AgentDetailsPage({ params }: { params: { id: string } })
 
       <div className="grid md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-6">
+              {metaLoading && <div className="text-sm text-muted-foreground">Loading on-chain metadata…</div>}
+              {onChainMeta && (
+                <div className="border border-border rounded-lg p-4 bg-card">
+                  <div className="text-xs text-muted-foreground">On-chain ID</div>
+                  <div className="font-mono">{onChainMeta.address || onChainMeta.contractAddress || onChainMeta.tokenId}</div>
+                  <div className="text-sm mt-2">{onChainMeta.name}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{onChainMeta.description}</div>
+                </div>
+              )}
           <div>
             <div className="flex items-center justify-between mb-2">
               <div>

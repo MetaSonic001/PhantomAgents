@@ -3,19 +3,55 @@
 import * as React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import WalletConnector from "@/components/wallet-connector"
+import { explorerLink } from "@/lib/starknet-client"
+import { useAccount } from "@starknet-react/core"
+import { signMessageNormalized } from "@/lib/starknet-sign"
 
 export default function BuyPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const { id } = React.use(params)
   const [processing, setProcessing] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [txHash, setTxHash] = useState<string | null>(null)
+
+  // Buyer address will be read from connected wallet in a real flow; here we accept an optional override
+  const [buyerAddress, setBuyerAddress] = useState<string | undefined>(undefined)
+  const { account, address } = useAccount() as any
 
   const handleBuy = async () => {
     setProcessing(true)
-    // Simulate purchase flow (frontend-only)
-    await new Promise((r) => setTimeout(r, 1200))
-    setProcessing(false)
-    setSuccess(true)
+    try {
+      // Auto-fill buyer address from connected wallet if available
+      const buyer = buyerAddress || account?.address || account
+
+      // Try to sign a purchase intent if possible
+      let signature = null
+      if (account) {
+        try {
+          signature = await signMessageNormalized(account, JSON.stringify({ action: "buy", listingId: id, buyer }))
+        } catch (e) {
+          console.warn("buy signature failed", e)
+        }
+      }
+
+      const res = await fetch("/api/starknet/buy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listingId: id, buyer, signature }),
+      })
+      const j = await res.json()
+      setProcessing(false)
+      if (j?.txHash) {
+        setTxHash(j.txHash)
+        setSuccess(true)
+      } else {
+        setSuccess(true)
+      }
+    } catch (err) {
+      console.error(err)
+      setProcessing(false)
+    }
   }
 
   return (
@@ -42,11 +78,27 @@ export default function BuyPage({ params }: { params: { id: string } }) {
               </div>
             </div>
 
-            <div className="flex gap-2">
-              <button onClick={handleBuy} disabled={processing} className="px-4 py-2 bg-primary text-primary-foreground rounded-md">
-                {processing ? "Processing..." : "Complete Purchase"}
-              </button>
-              <button onClick={() => router.back()} className="px-4 py-2 border rounded-md">Cancel</button>
+            <div className="border border-border rounded-lg p-4 bg-card">
+              <h4 className="text-sm font-semibold mb-2">On-chain purchase</h4>
+              <p className="text-xs text-muted-foreground mb-2">Connect your wallet and submit the on-chain buy transaction.</p>
+              <div className="mb-2">
+                <WalletConnector />
+              </div>
+              <div className="mb-2">
+                <label className="text-xs">Buyer address (optional override)</label>
+                <input value={buyerAddress ?? ""} onChange={(e) => setBuyerAddress(e.target.value)} placeholder="0x..." className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div className="flex gap-2">
+                <button onClick={handleBuy} disabled={processing} className="px-4 py-2 bg-primary text-primary-foreground rounded-md">
+                  {processing ? "Processing..." : "Buy On-Chain"}
+                </button>
+                <button onClick={() => router.back()} className="px-4 py-2 border rounded-md">Cancel</button>
+              </div>
+              {txHash && (
+                <div className="mt-3 text-sm">
+                  Submitted tx: <a href={explorerLink(txHash)} className="text-primary font-mono" target="_blank" rel="noreferrer">{txHash}</a>
+                </div>
+              )}
             </div>
           </div>
         ) : (

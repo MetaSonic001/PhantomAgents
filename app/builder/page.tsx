@@ -4,8 +4,11 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useAccount, useConnect, useDisconnect, useNetwork } from "@starknet-react/core"
 import { Sidebar } from "@/components/sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
+import WalletConnector from "@/components/wallet-connector"
+import { explorerLink } from "@/lib/starknet-client"
 import { CheckCircle2, Circle, ChevronRight, Eye, Code2, Play } from "lucide-react"
 import { AgentIdentity } from "@/components/builder/agent-identity"
 import { CapabilitiesPanel } from "@/components/builder/capabilities-panel"
@@ -13,6 +16,12 @@ import { DataSourcesPanel } from "@/components/builder/data-sources-panel"
 import { IntegrationsPanel } from "@/components/builder/integrations-panel"
 import { RulesPanel } from "@/components/builder/rules-panel"
 import { PreviewPanel } from "@/components/builder/preview-panel"
+import { signMessageNormalized } from "@/lib/starknet-sign"
+import RAGSources from "@/components/builder/rag-sources"
+import AgentPolicies from "@/components/builder/agent-policies"
+import Scheduler from "@/components/builder/scheduler"
+import ExposureRules from "@/components/builder/exposure-rules"
+import BYOKeys from "@/components/builder/byo-keys"
 
 const BUILDER_SECTIONS = [
   {
@@ -68,10 +77,26 @@ const BUILDER_SECTIONS = [
 
 export default function BuilderPage() {
   const router = useRouter()
+  const { account, address, status } = useAccount() as any
+  const { connect, connectors } = useConnect() as any
+  const { disconnect } = useDisconnect() as any
+  const { chain } = useNetwork() as any
+
+  const [registering, setRegistering] = useState(false)
+  const [registeredInfo, setRegisteredInfo] = useState<any | null>(null)
   const [activeSection, setActiveSection] = useState("identity")
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [showCommandPalette, setShowCommandPalette] = useState(false)
-  const [agentData, setAgentData] = useState({
+  type AgentData = {
+    name: string
+    tagline: string
+    description: string
+    type: string
+    personality: string[]
+    visibility: "private" | "public"
+  }
+
+  const [agentData, setAgentData] = useState<AgentData>({
     name: "My Agent",
     tagline: "",
     description: "",
@@ -159,7 +184,7 @@ export default function BuilderPage() {
                   >
                     <div className="px-3 py-3">
                       <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 mt-0.5">
+                        <div className="shrink-0 mt-0.5">
                           {isCompleted ? (
                             <CheckCircle2 className="w-5 h-5 text-primary" />
                           ) : (
@@ -185,7 +210,7 @@ export default function BuilderPage() {
                           </div>
                         </div>
 
-                        {isActive && <ChevronRight className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />}
+                        {isActive && <ChevronRight className="w-4 h-4 text-primary shrink-0 mt-0.5" />}
                       </div>
                     </div>
                   </button>
@@ -232,15 +257,117 @@ export default function BuilderPage() {
                           {BUILDER_SECTIONS[currentSectionIndex].label}
                         </h2>
                       </div>
+
                       <p className="text-muted-foreground">{BUILDER_SECTIONS[currentSectionIndex].description}</p>
+
+                      {/* Network & registration banner */}
+                        <div className="mt-4">
+                          <div className="flex items-center gap-3 text-xs">
+                            <div className="px-2 py-1 rounded bg-muted/30 text-muted-foreground">Network:</div>
+                            <div className="font-mono text-sm">{String(status ?? chain?.name ?? chain?.id ?? "unknown")}</div>
+                            <div className="ml-3 text-xs text-muted-foreground">{address || account ? `Connected: ${String(address ?? account?.address ?? account).slice(0, 14)}` : "Not connected"}</div>
+                          </div>
+
+                          {registeredInfo && (
+                            <div className="mt-3 p-3 rounded bg-primary/5 border border-primary/10 text-sm">
+                              <div className="font-medium">Agent registered on-chain</div>
+                              <div className="mt-1 font-mono text-xs">Address: {registeredInfo.contractAddress || registeredInfo.tokenId}</div>
+                              {registeredInfo.contractAddress && (
+                                <div className="mt-2">
+                                  <a href={explorerLink(registeredInfo.contractAddress)} target="_blank" rel="noreferrer" className="text-primary">
+                                    View on explorer
+                                  </a>
+                                  <a href={`/dashboard/marketplace/${registeredInfo.contractAddress}`} className="ml-4 text-sm">
+                                    View listing
+                                  </a>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                     </div>
-                    <div className="flex gap-2">
-                      <button className="p-2 hover:bg-secondary rounded-md transition">
-                        <Eye className="w-5 h-5 text-muted-foreground" />
-                      </button>
-                      <button className="p-2 hover:bg-secondary rounded-md transition">
-                        <Code2 className="w-5 h-5 text-muted-foreground" />
-                      </button>
+                    <div className="flex gap-4 items-center">
+                      <div className="hidden md:block">
+                        <WalletConnector />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={async () => {
+                            // noop preview action
+                          }}
+                          className="p-2 hover:bg-secondary rounded-md transition"
+                        >
+                          <Eye className="w-5 h-5 text-muted-foreground" />
+                        </button>
+                        <button className="p-2 hover:bg-secondary rounded-md transition">
+                          <Code2 className="w-5 h-5 text-muted-foreground" />
+                        </button>
+
+                        <div className="ml-3">
+                          <button
+                            onClick={async () => {
+                              // Register Agent flow
+                              if (!account) {
+                                try {
+                                  if (connect) await connect()
+                                } catch (e) {
+                                  console.error("connect failed", e)
+                                }
+                              }
+
+                              if (!account && !address) {
+                                alert("Please connect your StarkNet wallet before registering the agent.")
+                                return
+                              }
+
+                              setRegistering(true)
+                              setRegisteredInfo(null)
+                              try {
+                                const payload: any = { agentData }
+                                // Try to sign a registration message if the account exposes signMessage
+                                if ((account && typeof account.signMessage === "function") || (account && typeof account.request === "function")) {
+                                  const msg = JSON.stringify({ action: "register-agent", agent: agentData, ts: Date.now() })
+                                  try {
+                                    const sig = await signMessageNormalized(account ?? address, msg)
+                                    // include signer and signature
+                                    payload["signer"] = address ?? account?.address ?? account
+                                    payload["signature"] = sig
+                                  } catch (e) {
+                                    console.warn("sign failed", e)
+                                  }
+                                }
+
+                                const res = await fetch("/api/starknet/register-agent", {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify(payload),
+                                })
+                                const j = await res.json()
+                                setRegisteredInfo(j)
+
+                                // Persist as a local listing placeholder
+                                try {
+                                  const key = "phantom.seller.listings"
+                                  const existing = JSON.parse(localStorage.getItem(key) || "[]")
+                                  existing.push({ id: j.contractAddress || j.tokenId || `local-${Date.now()}`, agentData, onChain: j })
+                                  localStorage.setItem(key, JSON.stringify(existing))
+                                } catch (e) {
+                                  console.warn("local persist failed", e)
+                                }
+                              } catch (err) {
+                                console.error(err)
+                                alert("Failed to register agent: " + String(err))
+                              } finally {
+                                setRegistering(false)
+                              }
+                            }}
+                            disabled={registering}
+                            className="px-3 py-1 bg-accent text-foreground rounded-md text-sm"
+                          >
+                            {registering ? "Registering…" : "Register Agent"}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -257,11 +384,29 @@ export default function BuilderPage() {
                   {activeSection === "capabilities" && (
                     <CapabilitiesPanel onComplete={() => handleSectionComplete("capabilities")} />
                   )}
-                  {activeSection === "data" && <DataSourcesPanel onComplete={() => handleSectionComplete("data")} />}
+                  {activeSection === "data" && (
+                    <div className="space-y-6">
+                      <DataSourcesPanel onComplete={() => handleSectionComplete("data")} />
+                      <div className="mt-4">
+                        <BYOKeys agentName={agentData.name} />
+                      </div>
+                      <div className="mt-4">
+                        <RAGSources agentName={agentData.name} />
+                      </div>
+                    </div>
+                  )}
                   {activeSection === "integrations" && (
                     <IntegrationsPanel onComplete={() => handleSectionComplete("integrations")} />
                   )}
-                  {activeSection === "rules" && <RulesPanel onComplete={() => handleSectionComplete("rules")} />}
+                  {activeSection === "rules" && (
+                    <div className="space-y-6">
+                      <RulesPanel onComplete={() => handleSectionComplete("rules")} />
+                      <div className="mt-4 space-y-4">
+                        <AgentPolicies agentName={agentData.name} />
+                        <ExposureRules agentName={agentData.name} />
+                      </div>
+                    </div>
+                  )}
                   {activeSection === "monetization" && (
                     <div className="space-y-6">
                       <div className="border border-border rounded-lg p-6 bg-card">
@@ -307,6 +452,9 @@ export default function BuilderPage() {
                           <Play className="w-4 h-4" />
                           Run Test
                         </button>
+                      </div>
+                      <div className="border border-border rounded-lg p-6 bg-card">
+                        <Scheduler agentName={agentData.name} />
                       </div>
                       <div className="border border-border rounded-lg p-6 bg-card">
                         <h3 className="font-semibold mb-4 text-lg">Deployment</h3>

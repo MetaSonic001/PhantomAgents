@@ -3,8 +3,11 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Plus, Grid2x2, List, MoreVertical, Play, Pause, Trash2, Share2, Eye } from "lucide-react"
+import { useAccount, useConnect } from "@starknet-react/core"
+import { signMessageNormalized } from "@/lib/starknet-sign"
 import { Sidebar } from "@/components/sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
+import WalletConnector from "@/components/wallet-connector"
 
 const mockUserAgents = [
   {
@@ -48,6 +51,8 @@ const mockUserAgents = [
 export default function MyAgentsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null)
+  const { account, address } = useAccount() as any
+  const { connect } = useConnect() as any
 
   return (
     <div className="flex h-screen bg-background">
@@ -62,13 +67,18 @@ export default function MyAgentsPage() {
                 <h1 className="text-3xl font-bold mb-2">My Agents</h1>
                 <p className="text-muted-foreground">Manage and monitor your created agents</p>
               </div>
-              <Link
-                href="/builder"
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition font-medium"
-              >
-                <Plus className="w-4 h-4" />
-                New Agent
-              </Link>
+              <div className="flex items-center gap-4">
+                <div className="hidden md:block">
+                  <WalletConnector />
+                </div>
+                <Link
+                  href="/builder"
+                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition font-medium"
+                >
+                  <Plus className="w-4 h-4" />
+                  New Agent
+                </Link>
+              </div>
             </div>
 
             {/* Controls */}
@@ -113,6 +123,47 @@ export default function MyAgentsPage() {
 
                     {/* Stats */}
                     <div className="p-6 space-y-3">
+                      <div className="flex justify-between items-center mb-2">
+                        <div className="text-xs text-muted-foreground">On-chain ID</div>
+                        <div>
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation()
+                              if (!account) {
+                                try {
+                                  await connect()
+                                } catch (err) {
+                                  console.error(err)
+                                }
+                              }
+
+                              if (!account && !address) {
+                                alert("Connect wallet first to sign")
+                                return
+                              }
+
+                              try {
+                                const message = JSON.stringify({ action: "attest-agent", agentId: agent.id, ts: Date.now() })
+                                const sig = await signMessageNormalized(account ?? address, message)
+                                const key = "phantom.agent.signatures"
+                                const existing = JSON.parse(localStorage.getItem(key) || "{}")
+                                existing[agent.id] = { signature: sig, ts: Date.now() }
+                                localStorage.setItem(key, JSON.stringify(existing))
+                                alert("Signed agent attestation and saved locally")
+                              } catch (err) {
+                                console.error(err)
+                                alert("Signing failed: " + String(err))
+                              }
+                            }}
+                            className="px-2 py-1 text-xs border rounded-md"
+                          >
+                            Sign
+                          </button>
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground">On-chain ID: <span className="font-mono">0xabc...{agent.id}</span></div>
+                      <div className="text-xs text-muted-foreground">Status: <span className="font-mono">{agent.status}</span></div>
+                      
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-muted-foreground">Status</span>
                         <span
